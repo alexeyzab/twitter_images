@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require "twitter_images"
+
+TwitterImages::Configure.new

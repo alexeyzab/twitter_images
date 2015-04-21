@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require "twitter_images"
+
+settings = TwitterImages::Settings.new
+images = TwitterImages::Images.new(settings)
+TwitterImages::ImageDownloader.new(settings, images).download
