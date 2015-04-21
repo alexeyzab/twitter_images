@@ -1,4 +1,5 @@
 require "twitter_images/version"
+require "twitter_images/ti_configure"
 require 'rubygems'
 require 'open-uri'
 require 'fileutils'
@@ -74,7 +75,6 @@ module TwitterImages
     end
 
     def prepare
-      setup_credentials
       get_directory
       change_dir
       get_search
@@ -92,7 +92,7 @@ module TwitterImages
     private
 
     def setup_credentials
-      Configure_credentials.setup_credentials
+      TwitterImages::Configure_credentials.setup_credentials
     end
 
     def setup_http

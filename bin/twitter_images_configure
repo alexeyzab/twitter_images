@@ -2,4 +2,4 @@
 
 require "twitter_images"
 
-TwitterImages::Configure.new
+Configure.setup_credentials
