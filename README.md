@@ -1,5 +1,7 @@
 # TwitterImages
 
+[![Build Status](https://travis-ci.org/Alehanz/twitter_images.svg?branch=master)](https://travis-ci.org/Alehanz/twitter_images)
+
 This is a CLI tool for downloading the most recent images off of twitter based
 on the search terms you provide.
 
