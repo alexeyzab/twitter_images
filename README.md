@@ -17,12 +17,10 @@ Create a new app, go to Keys and Access Tokens, generate your Access Token.
 
 Then you can either set up
 
-    ```shell
     CONSUMER_KEY
     CONSUMER_SECRET
     ACCESS_TOKEN
     ACCESS_SECRET
-    ```
 
 in your .bashrc, .bash_profile, .zshenv or whichever shell config you normally
 use or you can just run
