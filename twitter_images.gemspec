@@ -9,11 +9,11 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Alexey Zabelin"]
   spec.email         = ["zabelin.alex@gmail.com"]
 
-  spec.summary       = %q{A CLI tool that downloads most recent images from twitter based on the search terms provided}
+  spec.summary       = %q{A CLI tool that downloads the most recent images from twitter based on the search terms provided}
   spec.description   = %q{Please remember that you need to provide your own
-consumer key and secret as well as the acess token and acess token secret. You
+consumer key and consumer secret as well as the access token and access token secret. You
 can find those over here: https://apps.twitter.com Just create a placeholder app
-and you are all set.}
+and generate the required credentials.}
   spec.homepage      = "https://github.com/Alehanz/twitter_images"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

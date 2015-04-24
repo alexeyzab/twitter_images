@@ -9,6 +9,7 @@ describe TwitterImages do
     let(:settings) { TwitterImages::Settings.new }
     let(:images) { TwitterImages::Images.new(settings) }
     let(:imagedownloader) { TwitterImages::ImageDownloader.new(settings, images) }
+
     describe "#initialize" do
       it "doesn't throw an error when initialized with settings and images" do
         expect(imagedownloader.settings).to eq(settings)
@@ -57,4 +58,3 @@ describe TwitterImages do
     end
   end
 end
-

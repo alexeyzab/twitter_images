@@ -1,11 +1,10 @@
 require "twitter_images/version"
-require "twitter_images/ti_configure"
 require 'rubygems'
-require 'open-uri'
-require 'fileutils'
-require 'json'
-require 'oauth'
-require 'ruby-progressbar'
+require "open-uri"
+require "fileutils"
+require "json"
+require "oauth"
+require "ruby-progressbar"
 
 
 module TwitterImages
@@ -75,6 +74,7 @@ module TwitterImages
     end
 
     def prepare
+      setup_credentials
       get_directory
       change_dir
       get_search
@@ -92,7 +92,32 @@ module TwitterImages
     private
 
     def setup_credentials
-      TwitterImages::Configure_credentials.setup_credentials
+      decide
+
+      @consumer_key = OAuth::Consumer.new(ENV["CONSUMER_KEY"], ENV["CONSUMER_SECRET"])
+
+      @access_token = OAuth::Token.new(ENV["ACCESS_TOKEN"], ENV["ACCESS_SECRET"])
+    end
+
+    def decide
+      puts "Would your like to update your Twitter credentials now? [y/n]"
+      decision = gets.chomp
+
+      if decision == "y"
+        puts "Please enter your Consumer Key: "
+        ENV["CONSUMER_KEY"] = gets.chomp
+        puts "Please enter your Consumer Secret: "
+        ENV["CONSUMER_SECRET"] = gets.chomp
+
+        puts "Please enter your Access Token: "
+        ENV["ACCESS_TOKEN"] = gets.chomp
+        puts "Please enter your Access Secret: "
+        ENV["ACCESS_SECRET"] = gets.chomp
+      elsif decision == "n"
+      else
+        puts "Wrong answer, please select [y/n]"
+        decide
+      end
     end
 
     def setup_http
