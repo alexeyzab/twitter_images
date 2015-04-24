@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["zabelin.alex@gmail.com"]
 
   spec.summary       = %q{A CLI tool that downloads the most recent images from twitter based on the search terms provided}
-  spec.description   = %q{Please remember that you need to provide your own
+  spec.description   = %q{A CLI tool that downloads the most recent images from twitter based on the search terms provided. Please remember that you need to provide your own
 consumer key and consumer secret as well as the access token and access token secret. You
 can find those over here: https://apps.twitter.com Just create a placeholder app
 and generate the required credentials.}
