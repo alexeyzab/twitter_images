@@ -1,32 +1,42 @@
 # TwitterImages
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/twitter_images`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+This is a CLI tool for downloading the most recent images off of twitter based
+on the search terms you provide.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'twitter_images'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+Execute this in the terminal:
 
     $ gem install twitter_images
 
 ## Usage
 
-TODO: Write usage instructions here
+In order to use this gem you have to set up your Twitter credentials.
+You can get those at [Twitter app management page](https://apps.twitter.com/).
+Create a new app, go to Keys and Access Tokens, generate your Access Token.
+
+Then you can either set up
+
+    ```shell
+    CONSUMER_KEY
+    CONSUMER_SECRET
+    ACCESS_TOKEN
+    ACCESS_SECRET
+    ```
+
+in your .bashrc, .bash_profile, .zshenv or whichever shell config you normally
+use or you can just run
+
+    $ twitter_images
+
+and set those up through the command prompts.
+
+After that you'll need to specify an absolute path to the folder you want to
+save your images to and specify search terms.
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bundle` to install dependencies.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
