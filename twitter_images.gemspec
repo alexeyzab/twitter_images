@@ -9,14 +9,14 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Alexey Zabelin"]
   spec.email         = ["zabelin.alex@gmail.com"]
 
+  spec.homepage      = "https://github.com/alexeyzab/twitter_images"
   spec.summary       = %q{A CLI tool that downloads the most recent images from twitter based on the search terms provided}
   spec.description   = %q{A CLI tool that downloads the most recent images from twitter based on the search terms provided. Please remember that you need to provide your own
 consumer key and consumer secret as well as the access token and access token secret. You
 can find those over here: https://apps.twitter.com Just create a placeholder app
 and generate the required credentials.}
-  spec.homepage      = "https://github.com/Alehanz/twitter_images"
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         = Dir["lib/**/*.rb", "bin/*"]
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
