@@ -1,11 +1,11 @@
 module TwitterImages
   class Image
     attr_accessor :images
-    attr_reader :settings
+    attr_reader :configuration
 
-    def initialize(settings)
+    def initialize(configuration)
       @images = images
-      @settings = settings
+      @configuration = configuration
     end
 
     def search
@@ -16,8 +16,8 @@ module TwitterImages
     private
 
     def get_images
-      @images = settings.output.inspect.scan(/http:\/\/pbs.twimg.com\/media\/\w+\.(?:jpg|png|gif)/)
-      raise StandardError, "Couldn't find any images" unless @images
+      @images = configuration.output.inspect.scan(/http:\/\/pbs.twimg.com\/media\/\w+\.(?:jpg|png|gif)/)
+      raise StandardError, "Couldn't find any images" unless (@images.count > 0)
     end
 
     def make_absolute(href, root)
@@ -27,7 +27,7 @@ module TwitterImages
     def save_images
       progressbar = ProgressBar.create(:total => images.count)
       images.each do |src|
-        uri = make_absolute(src, settings.search)
+        uri = make_absolute(src, configuration.search)
         File.open(File.basename(uri), 'wb'){ |f| f.write(open(uri).read) }
         progressbar.increment
       end

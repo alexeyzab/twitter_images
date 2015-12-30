@@ -7,5 +7,5 @@ require "ruby-progressbar"
 
 require "twitter_images/configuration"
 require "twitter_images/image"
-require "twitter_images/image_downloader"
+require "twitter_images/cli"
 require "twitter_images/version"

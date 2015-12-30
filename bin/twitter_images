@@ -5,4 +5,4 @@ require "twitter_images"
 
 configuration = TwitterImages::Configuration.new
 images = TwitterImages::Image.new(configuration)
-TwitterImages::ImageDownloader.new(configuration, images).download
+TwitterImages::CLI.new(configuration, images).download
