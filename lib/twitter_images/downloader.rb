@@ -1,5 +1,5 @@
 module TwitterImages
-  class Image
+  class Downloader
     attr_accessor :images
     attr_reader :configuration
 
@@ -8,7 +8,7 @@ module TwitterImages
       @configuration = configuration
     end
 
-    def search
+    def download
       get_images
       save_images
     end

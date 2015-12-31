@@ -1,15 +1,15 @@
 module TwitterImages
   class CLI
-    attr_accessor :images, :configuration
+    attr_accessor :downloader, :configuration
 
-    def initialize(configuration, images)
+    def initialize(configuration, downloader)
       @configuration = configuration
-      @images = images
+      @downloader = downloader
     end
 
-    def download
+    def run
       configuration.prepare
-      images.search
+      downloader.download
     end
   end
 end

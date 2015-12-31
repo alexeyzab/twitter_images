@@ -4,5 +4,5 @@ $LOAD_PATH.unshift(File.expand_path("../lib", __FILE__))
 require "twitter_images"
 
 configuration = TwitterImages::Configuration.new
-images = TwitterImages::Image.new(configuration)
-TwitterImages::CLI.new(configuration, images).download
+downloader = TwitterImages::Downloader.new(configuration)
+TwitterImages::CLI.new(configuration, downloader).run
