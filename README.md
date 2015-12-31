@@ -1,6 +1,6 @@
 # twitter_images
 
-[![Build Status](https://travis-ci.org/alexeyzab/twitter_images.svg?branch=master)](https://travis-ci.org/alexeyzab/twitter_images) [![Coverage Status](https://coveralls.io/repos/alexeyzab/twitter_images/badge.svg?branch=master&service=github)](https://coveralls.io/github/alexeyzab/twitter_images?branch=master) [![Gem Version](https://badge.fury.io/rb/twitter_images.svg)](http://badge.fury.io/rb/twitter_images)
+[![Gem Version](https://badge.fury.io/rb/twitter_images.svg)](http://badge.fury.io/rb/twitter_images)
 
 This is a CLI tool for downloading the most recent images off of twitter based
 on the search terms you provide.
