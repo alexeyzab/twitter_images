@@ -1,7 +1,7 @@
 module TwitterImages
   class Configuration
     attr_accessor :search, :directory, :output, :consumer_key, :access_token,
-      :address, :request, :http, :response
+                  :address, :request, :http, :response
 
     def initialize()
       @search = search
@@ -18,7 +18,7 @@ module TwitterImages
     def prepare
       setup_credentials
       get_directory
-      change_dir
+      change_directory
       get_search
       establish_connection
     end
@@ -34,31 +34,19 @@ module TwitterImages
     private
 
     def setup_credentials
-      decide
-
+      check_env
       @consumer_key = OAuth::Consumer.new(ENV["CONSUMER_KEY"], ENV["CONSUMER_SECRET"])
-
       @access_token = OAuth::Token.new(ENV["ACCESS_TOKEN"], ENV["ACCESS_SECRET"])
     end
 
-    def decide
-      puts "Would your like to update your Twitter credentials now? [y/n]"
-      decision = gets.chomp
-
-      if decision == "y"
-        puts "Please enter your Consumer Key: "
-        ENV["CONSUMER_KEY"] = gets.chomp
-        puts "Please enter your Consumer Secret: "
-        ENV["CONSUMER_SECRET"] = gets.chomp
-
-        puts "Please enter your Access Token: "
-        ENV["ACCESS_TOKEN"] = gets.chomp
-        puts "Please enter your Access Secret: "
-        ENV["ACCESS_SECRET"] = gets.chomp
-      elsif decision == "n"
+    def check_env
+      if ENV.key?("CONSUMER_KEY") &&
+         ENV.key?("CONSUMER_SECRET") &&
+         ENV.key?("ACCESS_TOKEN") &&
+         ENV.key?("ACCESS_SECRET")
+        return true
       else
-        puts "Wrong answer, please select [y/n]"
-        decide
+        return "The credentials have not been correctly set up in your ENV"
       end
     end
 
@@ -95,13 +83,14 @@ module TwitterImages
       raise StandardError, "Directory doesn't exist" unless Dir.exists?(@directory)
     end
 
-    def change_dir
+    def change_directory
       Dir.chdir(@directory)
     end
 
     def get_search
       puts "Please enter the search terms: "
       @search = gets.chomp.gsub(/\s/, "%20")
+      raise StandardError, "The search string is empty" if @search.empty?
     end
   end
 end
