@@ -4,6 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'twitter_images/version'
 
 Gem::Specification.new do |spec|
+  spec.required_ruby_version = "~> 2.0"
   spec.name          = "twitter_images"
   spec.version       = TwitterImages::VERSION
   spec.authors       = ["Alexey Zabelin"]
@@ -15,24 +16,24 @@ Gem::Specification.new do |spec|
 consumer key and consumer secret as well as the access token and access token secret. You
 can find those over here: https://apps.twitter.com Just create a placeholder app
 and generate the required credentials.}
+  spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*.rb", "bin/*"]
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
   if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = "https://rubygems.org"
+    spec.metadata["allowed_push_host"] = "https://rubygems.org"
   end
 
   spec.add_dependency "fileutils", "~> 0.7"
-  spec.add_dependency "json", "~> 1.8.2"
-  spec.add_dependency "oauth", "~> 0.4.7"
-  spec.add_dependency "ruby-progressbar", "~> 1.7.5"
+  spec.add_dependency "json", "~> 1.8.2", ">= 1.8.2"
+  spec.add_dependency "oauth", "~> 0.4",  ">= 0.4.7"
+  spec.add_dependency "ruby-progressbar", "~> 1.7",  ">= 1.7.5"
 
   spec.add_development_dependency "bundler", "~> 1.8"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec"
-  # spec.add_development_dependency "coveralls", "~> 0.8.1"
-  spec.add_development_dependency "codeclimate-test-reporter"
+  spec.add_development_dependency "rspec", "~> 0"
+  spec.add_development_dependency "codeclimate-test-reporter", "~> 0"
   spec.add_development_dependency "rspec_junit_formatter", "0.2.2"
 end
