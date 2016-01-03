@@ -1,6 +1,7 @@
 # twitter_images
 
 [![Gem Version](https://badge.fury.io/rb/twitter_images.svg)](http://badge.fury.io/rb/twitter_images)
+[![Circle CI](https://circleci.com/gh/alexeyzab/twitter_images.svg?style=shield)](https://circleci.com/gh/alexeyzab/twitter_images)
 [![Code Climate](https://codeclimate.com/github/alexeyzab/twitter_images/badges/gpa.svg)](https://codeclimate.com/github/alexeyzab/twitter_images)
 [![Test Coverage](https://codeclimate.com/github/alexeyzab/twitter_images/badges/coverage.svg)](https://codeclimate.com/github/alexeyzab/twitter_images/coverage)
 
