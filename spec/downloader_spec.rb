@@ -45,5 +45,18 @@ describe TwitterImages::Downloader do
       expect { downloader.send(:get_images) }.to raise_error(StandardError)
     end
   end
-end
 
+  describe "#save_images" do
+    it "saves images to a folder" do
+      downloader.images = ["http://pbs.twimg.com/media/123456789000000.jpg"]
+      data = File.open("spec/fixture.jpg", "r")
+      allow(downloader).to receive(:open).and_return(data)
+      configuration.directory = "#{Dir.getwd}/spec"
+      configuration.send(:change_directory)
+
+      downloader.send(:save_images)
+
+      expect(File).to exist("#{Dir.getwd}/123456789000000.jpg")
+    end
+  end
+end
