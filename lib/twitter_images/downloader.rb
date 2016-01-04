@@ -23,7 +23,7 @@ module TwitterImages
     def save_images
       progressbar = ProgressBar.create(:total => images.count)
       images.each do |src|
-        File.open(File.basename(src), "wb") { |f| f.write(open(src).read) }
+        File.open(File.basename(src), "wb") { |f| f.write(open(src + ":large").read) }
         progressbar.increment
       end
     end
