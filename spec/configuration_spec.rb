@@ -2,10 +2,13 @@ require "spec_helper"
 
 describe TwitterImages::Configuration do
   configuration = TwitterImages::Configuration.new()
-  ENV["CONSUMER_KEY"] = "key"
-  ENV["CONSUMER_SECRET"] = "key_secret"
-  ENV["ACCESS_TOKEN"] = "token"
-  ENV["ACCESS_SECRET"] = "token_secret"
+  around do |example|
+    example.run
+    ENV["CONSUMER_KEY"] = "key"
+    ENV["CONSUMER_SECRET"] = "key_secret"
+    ENV["ACCESS_TOKEN"] = "token"
+    ENV["ACCESS_SECRET"] = "token_secret"
+  end
 
   describe "#initialize" do
     it "gets initialized with no arguments" do
@@ -75,14 +78,9 @@ describe TwitterImages::Configuration do
       ENV.delete("ACCESS_TOKEN")
       ENV.delete("ACCESS_SECRET")
 
+      expect(STDOUT).to receive(:puts).with("The credentials have not been correctly set up in your ENV")
+
       result = configuration.send(:check_env)
-
-      expect(result).to eq("The credentials have not been correctly set up in your ENV")
-
-      ENV["CONSUMER_KEY"] = "key"
-      ENV["CONSUMER_SECRET"] = "key_secret"
-      ENV["ACCESS_TOKEN"] = "token"
-      ENV["ACCESS_SECRET"] = "token_secret"
     end
   end
 

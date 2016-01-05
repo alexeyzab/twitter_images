@@ -46,7 +46,7 @@ module TwitterImages
          ENV.key?("ACCESS_SECRET")
         return true
       else
-        return "The credentials have not been correctly set up in your ENV"
+        puts "The credentials have not been correctly set up in your ENV"
       end
     end
 
