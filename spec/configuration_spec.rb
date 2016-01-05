@@ -95,10 +95,17 @@ describe TwitterImages::Configuration do
       expect(configuration.directory).to eq("#{Dir.getwd}")
     end
 
-    it "raises the StandardError when the entered directory does not exist" do
-      allow(configuration).to receive(:gets).and_return("\n")
+    it "raises a StandardError when the entered directory does not exist" do
+      allow(configuration).to receive(:gets).and_return("/idontexist\n")
+      allow(configuration).to receive(:directory_exists?).and_return(false)
 
       expect { configuration.send(:get_directory) }.to raise_error(StandardError)
+    end
+
+    it "correctly parses the tilde sign" do
+      allow(configuration).to receive(:gets).and_return("~\n")
+
+      expect { configuration.send(:get_directory) }.not_to raise_error
     end
   end
 

@@ -78,13 +78,17 @@ module TwitterImages
     end
 
     def get_directory
-      puts "Please enter the absolute path to the directory to save the images in: "
+      puts "Please enter the directory to save the images in: "
       @directory = gets.chomp
-      raise StandardError, "Directory doesn't exist" unless Dir.exists?(@directory)
+      raise StandardError, "Directory doesn't exist" unless directory_exists?
+    end
+
+    def directory_exists?
+      Dir.exists?(File.expand_path(@directory))
     end
 
     def change_directory
-      Dir.chdir(@directory)
+      Dir.chdir(File.expand_path(@directory))
     end
 
     def get_search
