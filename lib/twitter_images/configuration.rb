@@ -84,7 +84,7 @@ module TwitterImages
     end
 
     def directory_exists?
-      Dir.exists?(File.expand_path(@directory))
+      Dir.exist?(File.expand_path(@directory))
     end
 
     def change_directory
