@@ -1,30 +1,21 @@
 require "spec_helper"
 
 describe TwitterImages::CLI do
-  configuration = TwitterImages::Configuration.new
-  downloader = TwitterImages::Downloader.new(configuration)
-  cli = TwitterImages::CLI.new(configuration, downloader)
+  cli = TwitterImages::CLI.new
 
   describe "#initialize" do
-    it "doesn't throw an error when initialized with a configuration and a downloader" do
-      expect(cli.configuration).to eq(configuration)
-      expect(cli.downloader).to eq(downloader)
-    end
-
-    it "will throw an error if initialized with no configuration" do
-      expect { TwitterImages::CLI.new() }.to raise_error(ArgumentError)
+    it "sets up the configuration" do
+      expect(cli.configuration).to be_a(TwitterImages::Configuration)
     end
   end
 
-  describe "#download" do
-    it "downloads the images when the configuration is set" do
-      allow(configuration).to receive(:prepare)
-      allow(downloader).to receive(:download)
+  describe "#run" do
+    it "runs the preparation for the configuration" do
+      allow(cli.configuration).to receive(:prepare)
 
       cli.run
 
-      expect(configuration).to have_received(:prepare)
-      expect(downloader).to have_received(:download)
+      expect(cli.configuration).to have_received(:prepare)
     end
   end
 end
