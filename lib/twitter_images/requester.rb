@@ -1,7 +1,7 @@
 module TwitterImages
   class Requester
-    attr_reader   :address
-    attr_accessor :search, :consumer_key, :access_token, :https,
+    attr_reader   :address, :consumer_key, :access_token
+    attr_accessor :search,  :https,
                   :request, :response
 
     def initialize(search)
@@ -9,7 +9,7 @@ module TwitterImages
     end
 
     def start
-      setup_credentials
+      check_env
       setup_https
       build_request
       issue_request
@@ -22,10 +22,12 @@ module TwitterImages
       URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&mode=photos&count=100")
     end
 
-    def setup_credentials
-      check_env
-      @consumer_key = OAuth::Consumer.new(ENV["CONSUMER_KEY"], ENV["CONSUMER_SECRET"])
-      @access_token = OAuth::Token.new(ENV["ACCESS_TOKEN"], ENV["ACCESS_SECRET"])
+    def consumer_key
+      OAuth::Consumer.new(ENV["CONSUMER_KEY"], ENV["CONSUMER_SECRET"])
+    end
+
+    def access_token
+      OAuth::Token.new(ENV["ACCESS_TOKEN"], ENV["ACCESS_SECRET"])
     end
 
     def check_env

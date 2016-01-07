@@ -15,7 +15,6 @@ describe TwitterImages::Requester do
 
   describe "#start" do
     it "calls the right methods to start the issue the request" do
-      allow(requester).to receive(:setup_credentials)
       allow(requester).to receive(:setup_https)
       allow(requester).to receive(:build_request)
       allow(requester).to receive(:issue_request)
@@ -23,27 +22,33 @@ describe TwitterImages::Requester do
 
       requester.start
 
-      expect(requester).to have_received(:setup_credentials)
       expect(requester).to have_received(:setup_https)
       expect(requester).to have_received(:build_request)
       expect(requester).to have_received(:issue_request)
     end
   end
 
-  describe "#setup_credentials" do
-    it "sets up the credentials" do
-      allow(requester).to receive(:check_env).and_return(true)
-      ENV["CONSUMER_KEY"] = "key"
-      ENV["CONSUMER_SECRET"] = "key_secret"
-      ENV["ACCESS_TOKEN"] = "token"
-      ENV["ACCESS_SECRET"] = "token_secret"
+  describe "#address" do
+    it "sets up the URI" do
+      result = requester.send(:address)
 
-      requester.send(:setup_credentials)
+      expect(result). to be_a(URI::HTTPS)
+    end
+  end
 
-      expect(requester.consumer_key.key).to eq("key")
-      expect(requester.consumer_key.secret).to eq("key_secret")
-      expect(requester.access_token.token).to eq("token")
-      expect(requester.access_token.secret).to eq("token_secret")
+  describe "#consumer_key" do
+    it "generates the consumer key object from the consumer key and secret" do
+      result = requester.send(:consumer_key)
+
+      expect(result).to be_a(OAuth::Consumer)
+    end
+  end
+
+  describe "#access_token" do
+    it "generates the access token object from the access token and secret" do
+      result = requester.send(:access_token)
+
+      expect(result).to be_a(OAuth::Token)
     end
   end
 
