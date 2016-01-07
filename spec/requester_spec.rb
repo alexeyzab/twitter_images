@@ -2,13 +2,6 @@ require "spec_helper"
 
 describe TwitterImages::Requester do
   requester = TwitterImages::Requester.new("cats")
-  around do |example|
-    example.run
-    ENV["CONSUMER_KEY"] = "key"
-    ENV["CONSUMER_SECRET"] = "key_secret"
-    ENV["ACCESS_TOKEN"] = "token"
-    ENV["ACCESS_SECRET"] = "token_secret"
-  end
 
   describe "#initialize" do
     it "doesn't raise an error when initialized with a search" do
@@ -42,6 +35,10 @@ describe TwitterImages::Requester do
   describe "#setup_credentials" do
     it "sets up the credentials" do
       allow(requester).to receive(:check_env).and_return(true)
+      ENV["CONSUMER_KEY"] = "key"
+      ENV["CONSUMER_SECRET"] = "key_secret"
+      ENV["ACCESS_TOKEN"] = "token"
+      ENV["ACCESS_SECRET"] = "token_secret"
 
       requester.send(:setup_credentials)
 
@@ -54,6 +51,10 @@ describe TwitterImages::Requester do
 
   describe "#check_env" do
     it "returns true if the credentials are found in ENV" do
+      ENV["CONSUMER_KEY"] = "key"
+      ENV["CONSUMER_SECRET"] = "key_secret"
+      ENV["ACCESS_TOKEN"] = "token"
+      ENV["ACCESS_SECRET"] = "token_secret"
       result = requester.send(:check_env)
 
       expect(result).to eq(true)
