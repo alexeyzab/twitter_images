@@ -8,6 +8,8 @@ module TwitterImages
       Requester.new(@search).start
     end
 
+    private
+
     def set_directory
       puts "Please enter the directory to save the images in: "
       @directory = gets.chomp
