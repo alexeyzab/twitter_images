@@ -16,6 +16,12 @@ module TwitterImages
       Downloader.new(@response).download
     end
 
+    private
+
+    def set_address
+      @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&mode=photos&count=100")
+    end
+
     def setup_credentials
       check_env
       @consumer_key = OAuth::Consumer.new(ENV["CONSUMER_KEY"], ENV["CONSUMER_SECRET"])
@@ -31,10 +37,6 @@ module TwitterImages
       else
         puts "The credentials have not been correctly set up in your ENV"
       end
-    end
-
-    def set_address
-      @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&mode=photos&count=100")
     end
 
     def setup_https
