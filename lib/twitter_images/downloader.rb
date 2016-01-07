@@ -19,7 +19,7 @@ module TwitterImages
     end
 
     def parse_output
-      @images = output.inspect.scan(/http:\/\/pbs.twimg.com\/media\/\w+\.(?:jpg|png|gif)/)
+      @images = output.inspect.scan(/https:\/\/pbs.twimg.com\/media\/\w+\.(?:jpg|png|gif)/)
       raise StandardError, "Couldn't find any images" unless @images.count > 0
     end
 
