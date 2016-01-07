@@ -35,9 +35,12 @@ describe TwitterImages::Configuration do
     end
 
     it "correctly parses the tilde sign" do
+      current_directory = Dir.getwd
       allow(configuration).to receive(:gets).and_return("~\n")
 
       expect { configuration.send(:set_directory) }.not_to raise_error
+
+      Dir.chdir(current_directory)
     end
   end
 
