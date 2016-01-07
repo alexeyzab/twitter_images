@@ -12,15 +12,15 @@ module TwitterImages
       puts "Please enter the directory to save the images in: "
       @directory = gets.chomp
       raise StandardError, "Directory doesn't exist" unless directory_exists?
-      change_directory(@directory)
+      change_directory
     end
 
     def directory_exists?
       Dir.exist?(File.expand_path(@directory))
     end
 
-    def change_directory(directory)
-      Dir.chdir(File.expand_path(directory))
+    def change_directory
+      Dir.chdir(File.expand_path(@directory))
     end
 
     def get_search

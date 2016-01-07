@@ -1,94 +1,28 @@
 require "spec_helper"
 
 describe TwitterImages::Configuration do
-  configuration = TwitterImages::Configuration.new()
-  around do |example|
-    example.run
-    ENV["CONSUMER_KEY"] = "key"
-    ENV["CONSUMER_SECRET"] = "key_secret"
-    ENV["ACCESS_TOKEN"] = "token"
-    ENV["ACCESS_SECRET"] = "token_secret"
-  end
-
-  describe "#initialize" do
-    it "gets initialized with no arguments" do
-      expect { TwitterImages::Configuration.new() }.not_to raise_error
-    end
-  end
+  configuration = TwitterImages::Configuration.new
 
   describe "#prepare" do
     it "calls the right methods to prepare the configuration" do
-      allow(configuration).to receive(:setup_credentials).and_return(:true)
-      allow(configuration).to receive(:get_directory).and_return(:true)
-      allow(configuration).to receive(:change_directory).and_return(:true)
-      allow(configuration).to receive(:get_search).and_return(:true)
-      allow(configuration).to receive(:establish_connection).and_return(:true)
+      requester = double("Requester", :new => true, :start => true)
+      allow(TwitterImages::Requester).to receive(:new).and_return(requester)
+      allow(configuration).to receive(:set_directory)
+      allow(configuration).to receive(:get_search)
 
       configuration.prepare
 
-      expect(configuration).to have_received(:setup_credentials)
-      expect(configuration).to have_received(:get_directory)
-      expect(configuration).to have_received(:change_directory)
+      expect(configuration).to have_received(:set_directory)
       expect(configuration).to have_received(:get_search)
-      expect(configuration).to have_received(:establish_connection)
+      expect(requester).to have_received(:start)
     end
   end
 
-  describe "#establish_connection" do
-    it "calls the right method to establish the connection" do
-      allow(configuration).to receive(:setup_address).and_return(:true)
-      allow(configuration).to receive(:setup_http).and_return(:true)
-      allow(configuration).to receive(:build_request).and_return(:true)
-      allow(configuration).to receive(:issue_request).and_return(:true)
-      allow(configuration).to receive(:get_output).and_return(:true)
-
-      configuration.establish_connection
-
-      expect(configuration).to have_received(:setup_address)
-      expect(configuration).to have_received(:setup_http)
-      expect(configuration).to have_received(:build_request)
-      expect(configuration).to have_received(:issue_request)
-      expect(configuration).to have_received(:get_output)
-    end
-  end
-
-  describe "#setup_credentials" do
-    it "sets up the credentials" do
-      allow(configuration).to receive(:check_env).and_return(true)
-
-      configuration.send(:setup_credentials)
-
-      expect(configuration.consumer_key.key).to eq("key")
-      expect(configuration.consumer_key.secret).to eq("key_secret")
-      expect(configuration.access_token.token).to eq("token")
-      expect(configuration.access_token.secret).to eq("token_secret")
-    end
-  end
-
-  describe "#check_env" do
-    it "returns true if the credentials are found in ENV" do
-      result = configuration.send(:check_env)
-
-      expect(result).to eq(true)
-    end
-
-    it "tells you to the credentials have not been set up otherwise" do
-      ENV.delete("CONSUMER_KEY")
-      ENV.delete("CONSUMER_SECRET")
-      ENV.delete("ACCESS_TOKEN")
-      ENV.delete("ACCESS_SECRET")
-
-      expect(STDOUT).to receive(:puts).with("The credentials have not been correctly set up in your ENV")
-
-      result = configuration.send(:check_env)
-    end
-  end
-
-  describe "#get_directory" do
-    it "gets the directory" do
+  describe "#set_directory" do
+    it "sets the directory" do
       allow(configuration).to receive(:gets).and_return("#{Dir.getwd}\n")
 
-      configuration.send(:get_directory)
+      configuration.send(:set_directory)
 
       expect(configuration.directory).to eq("#{Dir.getwd}")
     end
@@ -97,13 +31,13 @@ describe TwitterImages::Configuration do
       allow(configuration).to receive(:gets).and_return("/idontexist\n")
       allow(configuration).to receive(:directory_exists?).and_return(false)
 
-      expect { configuration.send(:get_directory) }.to raise_error(StandardError)
+      expect { configuration.send(:set_directory) }.to raise_error(StandardError)
     end
 
     it "correctly parses the tilde sign" do
       allow(configuration).to receive(:gets).and_return("~\n")
 
-      expect { configuration.send(:get_directory) }.not_to raise_error
+      expect { configuration.send(:set_directory) }.not_to raise_error
     end
   end
 
