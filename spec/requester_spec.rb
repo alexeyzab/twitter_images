@@ -15,7 +15,6 @@ describe TwitterImages::Requester do
 
   describe "#start" do
     it "calls the right methods to start the issue the request" do
-      allow(requester).to receive(:set_address)
       allow(requester).to receive(:setup_credentials)
       allow(requester).to receive(:setup_https)
       allow(requester).to receive(:build_request)
@@ -24,7 +23,6 @@ describe TwitterImages::Requester do
 
       requester.start
 
-      expect(requester).to have_received(:set_address)
       expect(requester).to have_received(:setup_credentials)
       expect(requester).to have_received(:setup_https)
       expect(requester).to have_received(:build_request)

@@ -1,6 +1,7 @@
 module TwitterImages
   class Requester
-    attr_accessor :search, :consumer_key, :access_token, :address, :https,
+    attr_reader   :address
+    attr_accessor :search, :consumer_key, :access_token, :https,
                   :request, :response
 
     def initialize(search)
@@ -8,7 +9,6 @@ module TwitterImages
     end
 
     def start
-      set_address
       setup_credentials
       setup_https
       build_request
@@ -18,8 +18,8 @@ module TwitterImages
 
     private
 
-    def set_address
-      @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&mode=photos&count=100")
+    def address
+      URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&mode=photos&count=100")
     end
 
     def setup_credentials
