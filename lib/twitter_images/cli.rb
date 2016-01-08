@@ -1,9 +1,9 @@
 module TwitterImages
   class CLI
-    attr_accessor :configuration
+    attr_reader :configuration
 
-    def initialize()
-      @configuration = Configuration.new
+    def initialize(configuration)
+      @configuration = configuration
     end
 
     def run
