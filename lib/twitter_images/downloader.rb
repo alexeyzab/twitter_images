@@ -1,20 +1,16 @@
 module TwitterImages
   class Downloader
-    attr_accessor :response, :output, :images
+    attr_accessor :output, :images
 
-    def initialize(response)
-      @response = response
-    end
-
-    def download
-      get_output
+    def download(response)
+      get_output(response)
       parse_output
       save_images
     end
 
     private
 
-    def get_output
+    def get_output(response)
       @output = JSON.parse(response.body)
     end
 
