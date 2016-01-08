@@ -4,33 +4,32 @@ describe TwitterImages::Requester do
   requester = TwitterImages::Requester.new("cats")
 
   describe "#initialize" do
-    it "doesn't raise an error when initialized with a search" do
-      expect(requester.search).to eq("cats")
+    it "doesn't raise an error when initialized with a downloader" do
+      downloader = double("Downloader")
+      requester = TwitterImages::Requester.new(downloader)
+
+      expect(requester.downloader).to eq(downloader)
     end
 
-    it "throws an error if initialized with no search" do
+    it "throws an error if initialized with no downloader" do
       expect { TwitterImages::Requester.new() }.to raise_error(ArgumentError)
     end
   end
 
   describe "#start" do
-    it "calls the right methods to start the issue the request" do
-      allow(requester).to receive(:setup_https)
-      allow(requester).to receive(:build_request)
-      allow(requester).to receive(:issue_request)
-      allow(TwitterImages::Downloader).to receive_message_chain(:new, :download)
+    it "passes on the download message to downloader" do
+      downloader = double("Downloader", :download => true)
+      requester = TwitterImages::Requester.new(downloader)
 
-      requester.start
+      requester.start("cats")
 
-      expect(requester).to have_received(:setup_https)
-      expect(requester).to have_received(:build_request)
-      expect(requester).to have_received(:issue_request)
+      expect(downloader).to have_received(:download)
     end
   end
 
-  describe "#address" do
+  describe "#setup_address" do
     it "sets up the URI" do
-      result = requester.send(:address)
+      result = requester.send(:setup_address, "cats")
 
       expect(result). to be_a(URI::HTTPS)
     end

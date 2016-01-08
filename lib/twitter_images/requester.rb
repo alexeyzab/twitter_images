@@ -1,25 +1,25 @@
 module TwitterImages
   class Requester
-    attr_reader   :address, :consumer_key, :access_token
-    attr_accessor :search,  :https,
-                  :request, :response
+    attr_reader   :consumer_key, :access_token, :downloader, :search
+    attr_accessor :https, :address, :request, :response
 
-    def initialize(search)
-      @search = search
+    def initialize(downloader)
+      @downloader = downloader
     end
 
-    def start
+    def start(search)
+      setup_address(search)
       check_env
       setup_https
       build_request
       issue_request
-      Downloader.new(@response).download
+      download
     end
 
     private
 
-    def address
-      URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&mode=photos&count=100")
+    def setup_address(search)
+      @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&mode=photos&count=100")
     end
 
     def consumer_key
@@ -58,6 +58,10 @@ module TwitterImages
       # Issue the request and return the response.
       @https.start
       @response = https.request(request)
+    end
+
+    def download
+      downloader.download(@response)
     end
   end
 end
