@@ -1,7 +1,7 @@
 module TwitterImages
   class Configuration
     attr_reader   :requester
-    attr_accessor :search, :directory
+    attr_accessor :search, :directory, :amount
 
     def initialize(requester)
       @requester = requester
@@ -10,6 +10,7 @@ module TwitterImages
     def prepare
       set_directory
       get_search
+      get_amount
       start
     end
 
@@ -36,8 +37,14 @@ module TwitterImages
       raise StandardError, "The search string is empty" if @search.empty?
     end
 
+    def get_amount
+      puts "Please enter the number of images to download: "
+      @amount = gets.chomp.to_i
+      raise StandardError, "The number is too small" if @amount <= 0
+    end
+
     def start
-      requester.start(@search)
+      requester.start(@search, @amount)
     end
   end
 end
