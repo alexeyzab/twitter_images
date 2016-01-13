@@ -2,29 +2,33 @@ module TwitterImages
   class Downloader
     attr_accessor :output, :images
 
-    def download(response)
-      get_output(response)
-      parse_output
-      save_images
+    def download(all_links)
+      save_images(all_links)
     end
 
     private
 
-    def get_output(response)
-      @output = JSON.parse(response.body)
+    def write_file(filename, data)
+      file = File.new(File.basename(filename), "wb")
+      file.write(data)
+      file.close
     end
 
-    def parse_output
-      @images = output.inspect.scan(/https:\/\/pbs.twimg.com\/media\/\w+\.(?:jpg|png|gif)/)
-      raise StandardError, "Couldn't find any images" unless @images.count > 0
-    end
+    def save_images(all_links)
+      progressbar = ProgressBar.create(:total => all_links.count)
+      hydra = Typhoeus::Hydra.new
 
-    def save_images
-      progressbar = ProgressBar.create(:total => images.count)
-      images.each do |src|
-        File.open(File.basename(src), "wb") { |f| f.write(open(src + ":large").read) }
-        progressbar.increment
+      all_links.each do |src|
+        request = Typhoeus::Request.new(src + ":large")
+        request.on_complete do |response|
+          write_file(src, response.body)
+          progressbar.increment
+        end
+        hydra.queue request
       end
+      hydra.run
+      puts "Downloaded #{all_links.count} pictures!"
     end
   end
+
 end

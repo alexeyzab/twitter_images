@@ -20,6 +20,7 @@ describe TwitterImages::Requester do
     it "passes on the download message to downloader" do
       downloader = double("Downloader", :download => true)
       requester = TwitterImages::Requester.new(downloader)
+      allow(requester).to receive(:get_links).with("cats", 200)
 
       requester.start("cats", 200)
 
@@ -27,14 +28,14 @@ describe TwitterImages::Requester do
     end
   end
 
-  describe "#get_json" do
+  describe "#get_links" do
     it "accumulates the image links in an array" do
       downloader = double("Downloader", :download => true)
       requester = TwitterImages::Requester.new(downloader)
 
-      requester.get_json("cats", 2)
+      requester.get_links("cats", 2)
 
-      expect(requester.all_responses).to be_a(Array)
+      expect(requester.all_links).to be_a(Array)
     end
   end
 
@@ -151,12 +152,12 @@ describe TwitterImages::Requester do
     it "trims the links if there are more of them than needed" do
       downloader = double("Downloader")
       requester = TwitterImages::Requester.new(downloader)
-      requester.all_responses = ["https://pbs.twimg.com/media/first.jpg", "https://pbs.twimg.com/media/second.gif", "https://pbs.twimg.com/media/third.png" ]
+      requester.all_links = ["https://pbs.twimg.com/media/first.jpg", "https://pbs.twimg.com/media/second.gif", "https://pbs.twimg.com/media/third.png" ]
       amount = 2
 
       requester.send(:trim_links, amount)
 
-      expect(requester.all_responses.count).to eq(amount)
+      expect(requester.all_links.count).to eq(amount)
     end
   end
 

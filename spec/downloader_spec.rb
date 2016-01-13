@@ -10,62 +10,26 @@ describe TwitterImages::Downloader do
 
   describe "#download" do
     it "makes sure the proper methods get called" do
-      response = double("response")
+      all_links = double("all_links")
       downloader = TwitterImages::Downloader.new
-      allow(downloader).to receive(:get_output).with(response)
-      allow(downloader).to receive(:parse_output)
-      allow(downloader).to receive(:save_images)
+      allow(downloader).to receive(:save_images).with(all_links)
 
-      downloader.download(response)
+      downloader.download(all_links)
 
-      expect(downloader).to have_received(:get_output).with(response)
-      expect(downloader).to have_received(:parse_output)
-      expect(downloader).to have_received(:save_images)
-    end
-  end
-
-  describe "#get_output" do
-    it "parses the JSON of the response into a hash" do
-      response = double("response", :body => "{\"id\":1,\"media\":{\"media_url_http\":\"https://pbs.twimg.com/media/name.jpg\"}}")
-      downloader = TwitterImages::Downloader.new
-
-      downloader.send(:get_output, response)
-
-      expect(downloader.output).to be_a(Hash)
-    end
-  end
-
-  describe "#parse_output" do
-    it "gets the links to the images" do
-      response = double("response", :body => "{\"id\":1,\"media\":{\"media_url_https\":\"https://pbs.twimg.com/media/name.jpg\"}}")
-      downloader = TwitterImages::Downloader.new
-      downloader.send(:get_output, response)
-
-      downloader.send(:parse_output)
-      result = downloader.images
-
-      expect(result).to eq(["https://pbs.twimg.com/media/name.jpg"])
-    end
-
-    it "raises an error if there are no images found" do
-      response = double("response", :body => "{\"id\":1,\"media\":{\"media_url_https\":\"nothing\"}}")
-      downloader = TwitterImages::Downloader.new
-      downloader.send(:get_output, response)
-
-      expect { downloader.send(:parse_output) }.to raise_error(StandardError)
+      expect(downloader).to have_received(:save_images).with(all_links)
     end
   end
 
   describe "#save_images" do
     it "saves images to a folder" do
       downloader = TwitterImages::Downloader.new
-      downloader.images = ["http://pbs.twimg.com/media/123456789000000.jpg"]
+      all_links  = ["http://pbs.twimg.com/media/123456789000000.jpg"]
       data = File.open("spec/fixture.jpg", "r")
       allow(downloader).to receive(:open).and_return(data)
 
       Dir.chdir("#{Dir.getwd}/spec")
 
-      downloader.send(:save_images)
+      downloader.send(:save_images, all_links)
 
       expect(File).to exist("#{Dir.getwd}/123456789000000.jpg")
     end

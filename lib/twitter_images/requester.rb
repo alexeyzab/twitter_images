@@ -1,26 +1,26 @@
 module TwitterImages
   class Requester
     attr_reader   :consumer_key, :access_token, :downloader, :search
-    attr_accessor :https, :address, :response, :max_id, :all_responses
+    attr_accessor :https, :address, :response, :max_id, :all_links
 
     def initialize(downloader)
       @downloader = downloader
-      @all_responses = []
+      @all_links = []
     end
 
     def start(search, amount)
       check_env
-      get_json(search, amount)
+      get_links(search, amount)
       download
     end
 
-    def get_json(search, amount)
+    def get_links(search, amount)
       loop do
         setup_address(search)
         setup_https
         issue_request
         parse_response
-        break if all_responses.count > amount
+        break if all_links.count > amount
       end
       trim_links(amount)
     end
@@ -82,16 +82,16 @@ module TwitterImages
     end
 
     def collect_responses(filtered)
-      @all_responses += filtered.inspect.scan(/https:\/\/pbs.twimg.com\/media\/\w+\.(?:jpg|png|gif)/)
-      @all_responses.uniq!
+      @all_links += filtered.inspect.scan(/https:\/\/pbs.twimg.com\/media\/\w+\.(?:jpg|png|gif)/)
+      @all_links.uniq!
     end
 
     def trim_links(amount)
-      @all_responses = @all_responses.slice!(0...amount)
+      @all_links = @all_links.slice!(0...amount)
     end
 
     def download
-      downloader.download(@all_responses)
+      downloader.download(@all_links)
     end
   end
 end
