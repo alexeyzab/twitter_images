@@ -32,9 +32,9 @@ describe TwitterImages::Requester do
       downloader = double("Downloader", :download => true)
       requester = TwitterImages::Requester.new(downloader)
 
-      requester.get_json("cats", 200)
+      requester.get_json("cats", 2)
 
-      expect(requester.response).to be_a(Array)
+      expect(requester.all_responses).to be_a(Array)
     end
   end
 
@@ -42,7 +42,14 @@ describe TwitterImages::Requester do
     it "sets up the URI" do
       result = requester.send(:setup_address, "cats")
 
-      expect(result). to be_a(URI::HTTPS)
+      expect(result).to be_a(URI::HTTPS)
+    end
+
+    it "adds the max_id parameter to the address if it's present" do
+      requester.max_id = 123456
+      result = requester.send(:setup_address, "cats")
+
+      expect(result.inspect).to eq("#<URI::HTTPS https://api.twitter.com/1.1/search/tweets.json?q=%23cats&result_type=recent&count=100&max_id=123456>")
     end
   end
 
@@ -113,7 +120,44 @@ describe TwitterImages::Requester do
 
       requester.send(:setup_https)
 
-      expect(requester.https.verify_mode).to eq(1)
+      expect(requester.https.verify_mode).to eq(0)
     end
   end
+
+  describe "#get_max_id" do
+    it "gets the minimum id minus one of all the parsed tweets" do
+      downloader = double("Downloader")
+      requester = TwitterImages::Requester.new(downloader)
+      filtered = { "statuses"=> [ { "id" => 123, "media" => [ { "media_url" => "https://pbs.twimg.com/media/name.jpg" } ] }, { "id" => 124, "media" => [ { "media_url" => "https://pbs.twimg.com/media/another.png" } ] } ] }
+      requester.send(:get_max_id, filtered)
+
+      expect(requester.max_id).to eq(122)
+    end
+  end
+
+  describe "#collect_responses" do
+    it "creates an array of image links to pass to the downloader" do
+      downloader = double("Downloader")
+      requester = TwitterImages::Requester.new(downloader)
+      hash = { "statuses"=> [ { "id" => 123, "media" => [ { "media_url" => "https://pbs.twimg.com/media/name.jpg" } ] }, { "id" => 124, "media" => [ { "media_url" => "https://pbs.twimg.com/media/another.png" } ] }, { "id" => 125, "media" => [ { "media_url" => "https://pbs.twimg.com/media/another.png" } ] } ] }
+
+      result = requester.send(:collect_responses, hash)
+
+      expect(result).to eq(["https://pbs.twimg.com/media/name.jpg", "https://pbs.twimg.com/media/another.png"])
+    end
+  end
+
+  describe "#trim_links" do
+    it "trims the links if there are more of them than needed" do
+      downloader = double("Downloader")
+      requester = TwitterImages::Requester.new(downloader)
+      requester.all_responses = ["https://pbs.twimg.com/media/first.jpg", "https://pbs.twimg.com/media/second.gif", "https://pbs.twimg.com/media/third.png" ]
+      amount = 2
+
+      requester.send(:trim_links, amount)
+
+      expect(requester.all_responses.count).to eq(amount)
+    end
+  end
+
 end

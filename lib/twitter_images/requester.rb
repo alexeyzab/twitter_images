@@ -1,12 +1,11 @@
 module TwitterImages
   class Requester
     attr_reader   :consumer_key, :access_token, :downloader, :search
-    attr_accessor :https, :address, :response, :max_id, :links, :parsed_links
+    attr_accessor :https, :address, :response, :max_id, :all_responses
 
     def initialize(downloader)
       @downloader = downloader
       @all_responses = []
-      @parsed_links = 0
     end
 
     def start(search, amount)
@@ -21,8 +20,9 @@ module TwitterImages
         setup_https
         issue_request
         parse_response
-        break if parsed_links > amount
+        break if all_responses.count > amount
       end
+      trim_links(amount)
     end
 
     private
@@ -55,17 +55,14 @@ module TwitterImages
     end
 
     def setup_https
-      # Set up Net::HTTP to use SSL, which is required by Twitter.
       @https = Net::HTTP.new(address.host, address.port)
       https.use_ssl = true
       https.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
 
     def issue_request
-      # Build the request and authorize it with OAuth
       request = Net::HTTP::Get.new(address.request_uri)
       request.oauth!(https, consumer_key, access_token)
-      # Issue the request and return the response.
       @https.start
       @response = https.request(request)
     end
@@ -74,7 +71,6 @@ module TwitterImages
       filtered = JSON.parse(@response.body)
       get_max_id(filtered)
       collect_responses(filtered)
-      count_links(filtered)
     end
 
     def get_max_id(filtered)
@@ -86,11 +82,12 @@ module TwitterImages
     end
 
     def collect_responses(filtered)
-      @all_responses += filtered.collect { |_k, v| v }
+      @all_responses += filtered.inspect.scan(/https:\/\/pbs.twimg.com\/media\/\w+\.(?:jpg|png|gif)/)
+      @all_responses.uniq!
     end
 
-    def count_links(filtered)
-      @parsed_links += filtered.inspect.scan(/https:\/\/pbs.twimg.com\/media\/\w+\.(?:jpg|png|gif)/).uniq.count
+    def trim_links(amount)
+      @all_responses = @all_responses.slice!(0...amount)
     end
 
     def download
