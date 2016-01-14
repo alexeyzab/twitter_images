@@ -28,17 +28,6 @@ describe TwitterImages::Requester do
     end
   end
 
-  describe "#get_links" do
-    it "accumulates the image links in an array" do
-      downloader = double("Downloader", :download => true)
-      requester = TwitterImages::Requester.new(downloader)
-
-      requester.get_links("cats", 2)
-
-      expect(requester.all_links).to be_a(Array)
-    end
-  end
-
   describe "#setup_address" do
     it "sets up the URI" do
       result = requester.send(:setup_address, "cats")

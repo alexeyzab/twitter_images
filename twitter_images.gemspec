@@ -37,4 +37,5 @@ and generate the required credentials.}
   spec.add_development_dependency "rspec", "~> 3.4"
   spec.add_development_dependency "codeclimate-test-reporter", "~> 0"
   spec.add_development_dependency "rspec_junit_formatter", "0.2.2"
+  spec.add_development_dependency "webmock", "1.22.6"
 end
