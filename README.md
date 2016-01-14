@@ -37,8 +37,10 @@ Then you should set up
 in your .bashrc, .bash_profile, .zshenv or whichever shell config you normally
 use.
 
-After that you'll need to specify a path to the folder you want to
-save your images to and specify the search terms.
+After that you can run the gem with `twitter_images` and follow the instructions
+on your screen.
+
+Please note that the Twitter API rate limit is 180 calls every 15 minutes.
 
 ## Development
 
