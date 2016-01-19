@@ -2,8 +2,8 @@ module TwitterImages
   class Downloader
     attr_accessor :output, :images
 
-    def download(all_links)
-      save_images(all_links)
+    def download(parsed_links)
+      save_images(parsed_links)
     end
 
     private
@@ -14,11 +14,11 @@ module TwitterImages
       file.close
     end
 
-    def save_images(all_links)
-      progressbar = ProgressBar.create(:total => all_links.count)
+    def save_images(parsed_links)
+      progressbar = ProgressBar.create(:total => parsed_links.count)
       hydra = Typhoeus::Hydra.new
 
-      all_links.each do |src|
+      parsed_links.each do |src|
         request = Typhoeus::Request.new(src + ":large")
         request.on_complete do |response|
           write_file(src, response.body)
@@ -27,7 +27,7 @@ module TwitterImages
         hydra.queue request
       end
       hydra.run
-      puts "Downloaded #{all_links.count} pictures!"
+      puts "Downloaded #{parsed_links.count} pictures!"
     end
   end
 

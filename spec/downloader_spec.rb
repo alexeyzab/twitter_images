@@ -10,26 +10,26 @@ describe TwitterImages::Downloader do
 
   describe "#download" do
     it "makes sure the proper methods get called" do
-      all_links = double("all_links")
+      parsed_links = double("parsed_links")
       downloader = TwitterImages::Downloader.new
-      allow(downloader).to receive(:save_images).with(all_links)
+      allow(downloader).to receive(:save_images).with(parsed_links)
 
-      downloader.download(all_links)
+      downloader.download(parsed_links)
 
-      expect(downloader).to have_received(:save_images).with(all_links)
+      expect(downloader).to have_received(:save_images).with(parsed_links)
     end
   end
 
   describe "#save_images" do
     it "saves images to a folder" do
       downloader = TwitterImages::Downloader.new
-      all_links  = ["http://pbs.twimg.com/media/123456789000000.jpg"]
+      parsed_links  = ["http://pbs.twimg.com/media/123456789000000.jpg"]
       data = File.open("spec/fixture.jpg", "r")
       allow(downloader).to receive(:open).and_return(data)
 
       Dir.chdir("#{Dir.getwd}/spec")
 
-      downloader.send(:save_images, all_links)
+      downloader.send(:save_images, parsed_links)
 
       expect(File).to exist("#{Dir.getwd}/123456789000000.jpg")
     end
