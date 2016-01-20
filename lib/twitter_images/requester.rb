@@ -1,11 +1,11 @@
 module TwitterImages
   class Requester
-    attr_reader   :consumer_key, :access_token, :downloader, :search
-    attr_accessor :https, :address, :response, :max_id, :all_links
+    attr_reader   :consumer_key, :access_token, :downloader, :search, :parser
+    attr_accessor :https, :address, :response
 
-    def initialize(downloader)
+    def initialize(downloader, parser)
       @downloader = downloader
-      @all_links = []
+      @parser = parser
     end
 
     def start(search, amount)
@@ -16,20 +16,24 @@ module TwitterImages
 
     def get_links(search, amount)
       loop do
-        setup_address(search)
-        setup_https
-        issue_request
-        parse_response
-        break if all_links.count > amount
+        configure_request(search)
+        parse
+        break if @parser.parsed_links.count > amount
       end
       trim_links(amount)
     end
 
     private
 
+    def configure_request(search)
+      setup_address(search)
+      setup_https
+      issue_request
+    end
+
     def setup_address(search)
-      unless @max_id.nil?
-        @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&result_type=recent&count=100&max_id=#{@max_id}")
+      unless parser.max_id.nil?
+        @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&result_type=recent&count=100&max_id=#{parser.max_id}")
       else
         @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&result_type=recent&count=100")
       end
@@ -67,31 +71,16 @@ module TwitterImages
       @response = https.request(request)
     end
 
-    def parse_response
-      filtered = JSON.parse(@response.body)
-      get_max_id(filtered)
-      collect_responses(filtered)
-    end
-
-    def get_max_id(filtered)
-      ids = []
-      filtered["statuses"].each do |tweet|
-        ids << tweet["id"]
-      end
-      @max_id = ids.min - 1
-    end
-
-    def collect_responses(filtered)
-      @all_links += filtered.inspect.scan(/https:\/\/pbs.twimg.com\/media\/\w+\.(?:jpg|png|gif)/)
-      @all_links.uniq!
+    def parse
+      parser.parse(response)
     end
 
     def trim_links(amount)
-      @all_links = @all_links.slice!(0...amount)
+      parser.trim_links(amount)
     end
 
     def download
-      downloader.download(@all_links)
+      downloader.download(parser.parsed_links)
     end
   end
 end

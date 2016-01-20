@@ -1,25 +1,25 @@
 require "spec_helper"
 
 describe TwitterImages::Requester do
-  requester = TwitterImages::Requester.new("cats")
 
   describe "#initialize" do
-    it "doesn't raise an error when initialized with a downloader" do
+    it "doesn't raise an error when initialized with a downloader and a parser" do
       downloader = double("Downloader")
-      requester = TwitterImages::Requester.new(downloader)
+      parser = double("Parser")
 
-      expect(requester.downloader).to eq(downloader)
+      expect { TwitterImages::Requester.new(downloader, parser) }.not_to raise_error
     end
 
-    it "throws an error if initialized with no downloader" do
-      expect { TwitterImages::Requester.new() }.to raise_error(ArgumentError)
+    it "throws an error if initialized with no arguments" do
+      expect { TwitterImages::Requester.new }.to raise_error(ArgumentError)
     end
   end
 
   describe "#start" do
     it "passes on the download message to downloader" do
       downloader = double("Downloader", :download => true)
-      requester = TwitterImages::Requester.new(downloader)
+      parser = double("Parser", :parsed_links => true)
+      requester = TwitterImages::Requester.new(downloader, parser)
       allow(requester).to receive(:get_links).with("cats", 200)
 
       requester.start("cats", 200)
@@ -28,15 +28,32 @@ describe TwitterImages::Requester do
     end
   end
 
+  describe "#get_links" do
+    it "calls the trim_links after getting enough links" do
+      downloader = double("Downloader")
+      parser = double("Parser", max_id: 1, parse: true, parsed_links: ["link", "link"])
+      requester = TwitterImages::Requester.new(downloader, parser)
+
+      expect(requester).to receive(:trim_links)
+
+      requester.get_links("cats", 1)
+    end
+  end
+
   describe "#setup_address" do
     it "sets up the URI" do
+      downloader = double("Downloader")
+      parser = double("Parser", max_id: 1)
+      requester = TwitterImages::Requester.new(downloader, parser)
       result = requester.send(:setup_address, "cats")
 
       expect(result).to be_a(URI::HTTPS)
     end
 
     it "adds the max_id parameter to the address if it's present" do
-      requester.max_id = 123456
+      downloader = double("Downloader")
+      parser = double("Parser", max_id: 123456)
+      requester = TwitterImages::Requester.new(downloader, parser)
       result = requester.send(:setup_address, "cats")
 
       expect(result.inspect).to eq("#<URI::HTTPS https://api.twitter.com/1.1/search/tweets.json?q=%23cats&result_type=recent&count=100&max_id=123456>")
@@ -45,6 +62,9 @@ describe TwitterImages::Requester do
 
   describe "#consumer_key" do
     it "generates the consumer key object from the consumer key and secret" do
+      downloader = double("Downloader")
+      parser = double("Parser")
+      requester = TwitterImages::Requester.new(downloader, parser)
       result = requester.send(:consumer_key)
 
       expect(result).to be_a(OAuth::Consumer)
@@ -53,6 +73,9 @@ describe TwitterImages::Requester do
 
   describe "#access_token" do
     it "generates the access token object from the access token and secret" do
+      downloader = double("Downloader")
+      parser = double("Parser")
+      requester = TwitterImages::Requester.new(downloader, parser)
       result = requester.send(:access_token)
 
       expect(result).to be_a(OAuth::Token)
@@ -61,6 +84,9 @@ describe TwitterImages::Requester do
 
   describe "#check_env" do
     it "returns true if the credentials are found in ENV" do
+      downloader = double("Downloader")
+      parser = double("Parser")
+      requester = TwitterImages::Requester.new(downloader, parser)
       ENV["CONSUMER_KEY"] = "key"
       ENV["CONSUMER_SECRET"] = "key_secret"
       ENV["ACCESS_TOKEN"] = "token"
@@ -71,6 +97,9 @@ describe TwitterImages::Requester do
     end
 
     it "tells you to the credentials have not been set up otherwise" do
+      downloader = double("Downloader")
+      parser = double("Parser")
+      requester = TwitterImages::Requester.new(downloader, parser)
       ENV.delete("CONSUMER_KEY")
       ENV.delete("CONSUMER_SECRET")
       ENV.delete("ACCESS_TOKEN")
@@ -78,14 +107,15 @@ describe TwitterImages::Requester do
 
       expect(STDOUT).to receive(:puts).with("The credentials have not been correctly set up in your ENV")
 
-      result = requester.send(:check_env)
+      requester.send(:check_env)
     end
   end
 
   describe "#setup_https" do
     it "sets up the http" do
       downloader = double("Downloader")
-      requester = TwitterImages::Requester.new(downloader)
+      parser = double("Parser")
+      requester = TwitterImages::Requester.new(downloader, parser)
       requester.address = double("address", :host => "api.twitter.com", :port => 443)
 
       requester.send(:setup_https)
@@ -93,9 +123,10 @@ describe TwitterImages::Requester do
       expect(requester.https).to be_a(Net::HTTP)
     end
 
-    it "enables the use of ssl" do
+    it "enables the use of SSL" do
       downloader = double("Downloader")
-      requester = TwitterImages::Requester.new(downloader)
+      parser = double("Parser")
+      requester = TwitterImages::Requester.new(downloader, parser)
       requester.address = double("address", :host => "api.twitter.com", :port => 443)
 
       requester.send(:setup_https)
@@ -105,7 +136,8 @@ describe TwitterImages::Requester do
 
     it "sets the right SSL verify mode" do
       downloader = double("Downloader")
-      requester = TwitterImages::Requester.new(downloader)
+      parser = double("Parser")
+      requester = TwitterImages::Requester.new(downloader, parser)
       requester.address = double("address", :host => "api.twitter.com", :port => 443)
 
       requester.send(:setup_https)
@@ -113,41 +145,4 @@ describe TwitterImages::Requester do
       expect(requester.https.verify_mode).to eq(0)
     end
   end
-
-  describe "#get_max_id" do
-    it "gets the minimum id minus one of all the parsed tweets" do
-      downloader = double("Downloader")
-      requester = TwitterImages::Requester.new(downloader)
-      filtered = { "statuses"=> [ { "id" => 123, "media" => [ { "media_url" => "https://pbs.twimg.com/media/name.jpg" } ] }, { "id" => 124, "media" => [ { "media_url" => "https://pbs.twimg.com/media/another.png" } ] } ] }
-      requester.send(:get_max_id, filtered)
-
-      expect(requester.max_id).to eq(122)
-    end
-  end
-
-  describe "#collect_responses" do
-    it "creates an array of image links to pass to the downloader" do
-      downloader = double("Downloader")
-      requester = TwitterImages::Requester.new(downloader)
-      hash = { "statuses"=> [ { "id" => 123, "media" => [ { "media_url" => "https://pbs.twimg.com/media/name.jpg" } ] }, { "id" => 124, "media" => [ { "media_url" => "https://pbs.twimg.com/media/another.png" } ] }, { "id" => 125, "media" => [ { "media_url" => "https://pbs.twimg.com/media/another.png" } ] } ] }
-
-      result = requester.send(:collect_responses, hash)
-
-      expect(result).to eq(["https://pbs.twimg.com/media/name.jpg", "https://pbs.twimg.com/media/another.png"])
-    end
-  end
-
-  describe "#trim_links" do
-    it "trims the links if there are more of them than needed" do
-      downloader = double("Downloader")
-      requester = TwitterImages::Requester.new(downloader)
-      requester.all_links = ["https://pbs.twimg.com/media/first.jpg", "https://pbs.twimg.com/media/second.gif", "https://pbs.twimg.com/media/third.png" ]
-      amount = 2
-
-      requester.send(:trim_links, amount)
-
-      expect(requester.all_links.count).to eq(amount)
-    end
-  end
-
 end
