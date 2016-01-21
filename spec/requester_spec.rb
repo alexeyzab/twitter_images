@@ -41,13 +41,13 @@ describe TwitterImages::Requester do
   end
 
   describe "#setup_address" do
-    it "sets up the URI" do
+    it "creates a URI without max_id" do
       downloader = double("Downloader")
-      parser = double("Parser", max_id: 1)
+      parser = double("Parser", max_id: nil)
       requester = TwitterImages::Requester.new(downloader, parser)
       result = requester.send(:setup_address, "cats")
 
-      expect(result).to be_a(URI::HTTPS)
+      expect(result.inspect).to eq("#<URI::HTTPS https://api.twitter.com/1.1/search/tweets.json?q=%23cats&result_type=recent&count=100>")
     end
 
     it "adds the max_id parameter to the address if it's present" do
@@ -143,6 +143,18 @@ describe TwitterImages::Requester do
       requester.send(:setup_https)
 
       expect(requester.https.verify_mode).to eq(0)
+    end
+  end
+
+  describe "#trim_links" do
+    it "calls the Parser's method" do
+      downloader = double("Downloader")
+      parser = double("Parser", trim_links: true)
+      requester = TwitterImages::Requester.new(downloader, parser)
+
+      requester.send(:trim_links, 10)
+
+      expect(parser).to have_received(:trim_links).with(10)
     end
   end
 end
