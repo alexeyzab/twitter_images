@@ -5,6 +5,7 @@ require "json"
 require "oauth"
 require "ruby-progressbar"
 require "typhoeus"
+require "optparse"
 
 require "twitter_images/cli"
 require "twitter_images/configuration"
