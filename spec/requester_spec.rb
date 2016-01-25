@@ -3,68 +3,53 @@ require "spec_helper"
 describe TwitterImages::Requester do
 
   describe "#initialize" do
-    it "doesn't raise an error when initialized with a downloader and a parser" do
-      downloader = double("Downloader")
-      parser = double("Parser")
-
-      expect { TwitterImages::Requester.new(downloader, parser) }.not_to raise_error
-    end
-
-    it "throws an error if initialized with no arguments" do
-      expect { TwitterImages::Requester.new }.to raise_error(ArgumentError)
+    it "doesn't raise an error when initialized" do
+      expect { TwitterImages::Requester.new }.not_to raise_error
     end
   end
 
   describe "#start" do
     it "passes on the download message to downloader" do
-      downloader = double("Downloader", :download => true)
-      parser = double("Parser", :parsed_links => true)
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
       allow(requester).to receive(:get_links).with("cats", 200)
 
-      requester.start("cats", 200)
+      expect(requester.downloader).to receive(:download)
 
-      expect(downloader).to have_received(:download)
+      requester.start("cats", 200)
     end
   end
 
   describe "#get_links" do
-    it "calls the trim_links after getting enough links" do
-      downloader = double("Downloader")
-      parser = double("Parser", max_id: 1, parse: true, parsed_links: ["link", "link"])
-      requester = TwitterImages::Requester.new(downloader, parser)
+    it "calls the right methods to get links" do
+      requester = TwitterImages::Requester.new
+      expect(requester).to receive(:configure_request).with("cats")
+      expect(requester).to receive(:parse)
+      expect(requester.parser).to receive(:trim_links).with(-1)
 
-      expect(requester).to receive(:trim_links)
-
-      requester.get_links("cats", 1)
+      requester.get_links("cats", -1)
     end
   end
 
   describe "#setup_address" do
     it "creates a URI without max_id" do
-      downloader = double("Downloader")
-      parser = double("Parser", max_id: nil)
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
       result = requester.send(:setup_address, "cats")
 
-      expect(result.inspect).to eq("#<URI::HTTPS https://api.twitter.com/1.1/search/tweets.json?q=%23cats&result_type=recent&count=100>")
+      expect(result.inspect).to eq("#<URI::HTTPS https://api.twitter.com/1.1/search/tweets.json?q=cats&result_type=recent&count=100>")
     end
 
     it "adds the max_id parameter to the address if it's present" do
-      downloader = double("Downloader")
-      parser = double("Parser", max_id: 123456)
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
+      requester.parser.max_id = 123456
       result = requester.send(:setup_address, "cats")
 
-      expect(result.inspect).to eq("#<URI::HTTPS https://api.twitter.com/1.1/search/tweets.json?q=%23cats&result_type=recent&count=100&max_id=123456>")
+      expect(result.inspect).to eq("#<URI::HTTPS https://api.twitter.com/1.1/search/tweets.json?q=cats&result_type=recent&count=100&max_id=123456>")
     end
   end
 
   describe "#consumer_key" do
     it "generates the consumer key object from the consumer key and secret" do
-      downloader = double("Downloader")
-      parser = double("Parser")
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
       result = requester.send(:consumer_key)
 
       expect(result).to be_a(OAuth::Consumer)
@@ -73,9 +58,7 @@ describe TwitterImages::Requester do
 
   describe "#access_token" do
     it "generates the access token object from the access token and secret" do
-      downloader = double("Downloader")
-      parser = double("Parser")
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
       result = requester.send(:access_token)
 
       expect(result).to be_a(OAuth::Token)
@@ -84,9 +67,7 @@ describe TwitterImages::Requester do
 
   describe "#check_env" do
     it "returns true if the credentials are found in ENV" do
-      downloader = double("Downloader")
-      parser = double("Parser")
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
       ENV["CONSUMER_KEY"] = "key"
       ENV["CONSUMER_SECRET"] = "key_secret"
       ENV["ACCESS_TOKEN"] = "token"
@@ -97,9 +78,7 @@ describe TwitterImages::Requester do
     end
 
     it "tells you to the credentials have not been set up otherwise" do
-      downloader = double("Downloader")
-      parser = double("Parser")
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
       ENV.delete("CONSUMER_KEY")
       ENV.delete("CONSUMER_SECRET")
       ENV.delete("ACCESS_TOKEN")
@@ -113,9 +92,7 @@ describe TwitterImages::Requester do
 
   describe "#setup_https" do
     it "sets up the http" do
-      downloader = double("Downloader")
-      parser = double("Parser")
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
       requester.address = double("address", :host => "api.twitter.com", :port => 443)
 
       requester.send(:setup_https)
@@ -124,9 +101,7 @@ describe TwitterImages::Requester do
     end
 
     it "enables the use of SSL" do
-      downloader = double("Downloader")
-      parser = double("Parser")
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
       requester.address = double("address", :host => "api.twitter.com", :port => 443)
 
       requester.send(:setup_https)
@@ -135,9 +110,7 @@ describe TwitterImages::Requester do
     end
 
     it "sets the right SSL verify mode" do
-      downloader = double("Downloader")
-      parser = double("Parser")
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
       requester.address = double("address", :host => "api.twitter.com", :port => 443)
 
       requester.send(:setup_https)
@@ -148,13 +121,10 @@ describe TwitterImages::Requester do
 
   describe "#trim_links" do
     it "calls the Parser's method" do
-      downloader = double("Downloader")
-      parser = double("Parser", trim_links: true)
-      requester = TwitterImages::Requester.new(downloader, parser)
+      requester = TwitterImages::Requester.new
+      expect(requester.parser).to receive(:trim_links).with(10)
 
       requester.send(:trim_links, 10)
-
-      expect(parser).to have_received(:trim_links).with(10)
     end
   end
 end

@@ -4,7 +4,7 @@ describe TwitterImages::Parser do
 
   describe "#initialize" do
     it "doesn't raise an error when initialized with a response" do
-      expect { TwitterImages::Parser.new() }.not_to raise_error
+      expect { TwitterImages::Parser.new }.not_to raise_error
     end
   end
 
