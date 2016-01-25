@@ -23,7 +23,7 @@ Execute this in the terminal:
 
 ## Usage
 
-![alt tag](http://i.imgur.com/4zm8D2K.gifv)
+![alt tag](http://i.imgur.com/4zm8D2K.gif)
 
 In order to use this gem you have to set up your Twitter credentials.
 You can get those at [Twitter app management page](https://apps.twitter.com/).
