@@ -23,6 +23,8 @@ Execute this in the terminal:
 
 ## Usage
 
+![alt tag](http://i.imgur.com/4zm8D2K.gifv)
+
 In order to use this gem you have to set up your Twitter credentials.
 You can get those at [Twitter app management page](https://apps.twitter.com/).
 Create a new app, go to Keys and Access Tokens, generate your Access Token.
@@ -37,8 +39,18 @@ Then you should set up
 in your .bashrc, .bash_profile, .zshenv or whichever shell config you normally
 use.
 
-After that you can run the gem with `twitter_images` and follow the instructions
-on your screen.
+The CLI format is as follows: `twitter_images [path] [search terms] [amount]`
+
+For example:
+
+`twitter_images ./test_pics "#cats" 50`
+
+will download 50 pictures into your ./test_pics directory.
+
+You can search for hashtags and multiple words if you enclose your search terms
+in quotes. You can also search for non-hashtags words like so:
+
+`twitter_images ./test_pics friends 150`
 
 Please note that the Twitter API rate limit is 180 calls every 15 minutes.
 
