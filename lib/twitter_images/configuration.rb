@@ -31,7 +31,6 @@ module TwitterImages
     end
 
     def get_search(term)
-      # @search = term.chomp.gsub(/\s/, "%20")
       @search = term.chomp.gsub(/\s/, "%20").gsub(/\#/, "%23")
       raise StandardError, "The search string is empty" if @search.empty?
     end
