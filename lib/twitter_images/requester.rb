@@ -3,9 +3,9 @@ module TwitterImages
     attr_reader   :consumer_key, :access_token, :downloader, :search, :parser
     attr_accessor :https, :address, :response
 
-    def initialize(downloader, parser)
-      @downloader = downloader
-      @parser = parser
+    def initialize
+      @downloader = Downloader.new
+      @parser = Parser.new
     end
 
     def start(search, amount)
@@ -33,9 +33,9 @@ module TwitterImages
 
     def setup_address(search)
       unless parser.max_id.nil?
-        @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&result_type=recent&count=100&max_id=#{parser.max_id}")
+        @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=#{search}&result_type=recent&count=100&max_id=#{parser.max_id}")
       else
-        @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=%23#{search}&result_type=recent&count=100")
+        @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=#{search}&result_type=recent&count=100")
       end
     end
 
