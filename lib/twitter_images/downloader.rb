@@ -15,7 +15,7 @@ module TwitterImages
     end
 
     def save_images(parsed_links)
-      progressbar = ProgressBar.create(:total => parsed_links.count)
+      progressbar = ProgressBar.create(:total => parsed_links.count, :format => "%a |%b>>%i| %p%% %t")
       hydra = Typhoeus::Hydra.new
 
       parsed_links.each do |src|
