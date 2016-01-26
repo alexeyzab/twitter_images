@@ -1,6 +1,6 @@
 module TwitterImages
   class CLI
-    attr_reader :configuration
+    attr_reader :configuration, :options
 
     def initialize(argv)
       @argv = argv

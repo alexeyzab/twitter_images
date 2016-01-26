@@ -21,5 +21,25 @@ describe TwitterImages::CLI do
       expect(cli.configuration).to have_received(:prepare)
     end
   end
+
+  describe "#parse_command_line_options" do
+    it "parses the global options" do
+      ARGV = ["./test_pics", "#cats", "50"]
+      cli = TwitterImages::CLI.new(ARGV)
+      allow(cli).to receive_message_chain(:global_options, :parse!)
+      expect(cli).to receive(:global_options)
+
+      cli.send(:parse_command_line_options)
+    end
+
+    it "assigns the options hash" do
+      ARGV = ["./test_pics", "#cats", "50"]
+      cli = TwitterImages::CLI.new(ARGV)
+
+      cli.send(:parse_command_line_options)
+
+      expect(cli.options).to eq({ :path => "./test_pics", :term => "#cats", :amount => "50" })
+    end
+  end
 end
 

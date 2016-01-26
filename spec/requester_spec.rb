@@ -30,6 +30,18 @@ describe TwitterImages::Requester do
     end
   end
 
+  describe "#configure_request" do
+    it "calls the right methods to configure request" do
+      requester = TwitterImages::Requester.new
+
+      expect(requester).to receive(:setup_address).with("cats")
+      expect(requester).to receive(:setup_https)
+      expect(requester).to receive(:issue_request)
+
+      requester.send(:configure_request, "cats")
+    end
+  end
+
   describe "#setup_address" do
     it "creates a URI without max_id" do
       requester = TwitterImages::Requester.new
@@ -116,6 +128,16 @@ describe TwitterImages::Requester do
       requester.send(:setup_https)
 
       expect(requester.https.verify_mode).to eq(0)
+    end
+  end
+
+  describe "#parse" do
+    it "sends parse to parser" do
+      requester = TwitterImages::Requester.new
+
+      expect(requester.parser).to receive(:parse)
+
+      requester.send(:parse)
     end
   end
 
