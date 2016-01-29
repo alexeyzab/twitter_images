@@ -62,6 +62,8 @@ describe TwitterImages::Requester do
   describe "#consumer_key" do
     it "generates the consumer key object from the consumer key and secret" do
       requester = TwitterImages::Requester.new
+      CONSUMER_KEY = "key"
+      CONSUMER_SECRET = "secret"
       result = requester.send(:consumer_key)
 
       expect(result).to be_a(OAuth::Consumer)

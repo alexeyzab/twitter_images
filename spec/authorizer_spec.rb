@@ -24,11 +24,13 @@ describe TwitterImages::Authorizer do
   describe "#get_request_token" do
     it "gets the request token" do
       oauth = double("Consumer", :get_request_token => 123456789)
+      TwitterImages::Authorizer::CONSUMER_KEY = "key"
+      TwitterImages::Authorizer::CONSUMER_SECRET = "secret"
       allow(OAuth::Consumer).to receive(:new).and_return(oauth)
 
       authorizer.send(:get_request_token)
 
-      expect(authorizer.request_token).not_to be(nil)
+      expect(authorizer.request_token).to eq(123456789)
     end
   end
 
