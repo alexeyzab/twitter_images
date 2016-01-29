@@ -39,7 +39,7 @@ describe TwitterImages::Configuration do
 
     it "raises a StandardError when the entered directory does not exist" do
       configuration = TwitterImages::Configuration.new
-      allow(configuration).to receive(:directory_exists?).and_return(false)
+      allow(Dir).to receive(:exist?).and_return(false)
 
       expect { configuration.send(:set_directory, "#{Dir.getwd}") }.to raise_error(StandardError, "Directory doesn't exist")
     end
