@@ -1,15 +1,15 @@
 module TwitterImages
   class Requester
-    attr_reader   :consumer_key, :access_token, :downloader, :search, :parser
+    attr_reader   :consumer_key, :access_token, :downloader, :search, :parser, :authorizer
     attr_accessor :https, :address, :response
 
     def initialize
       @downloader = Downloader.new
       @parser = Parser.new
+      @authorizer = Authorizer.new
     end
 
     def start(search, amount)
-      check_env
       get_links(search, amount)
       download
     end
@@ -40,22 +40,11 @@ module TwitterImages
     end
 
     def consumer_key
-      OAuth::Consumer.new(ENV["CONSUMER_KEY"], ENV["CONSUMER_SECRET"])
+      OAuth::Consumer.new(CONSUMER_KEY, CONSUMER_SECRET)
     end
 
     def access_token
-      OAuth::Token.new(ENV["ACCESS_TOKEN"], ENV["ACCESS_SECRET"])
-    end
-
-    def check_env
-      if ENV.key?("CONSUMER_KEY") &&
-          ENV.key?("CONSUMER_SECRET") &&
-          ENV.key?("ACCESS_TOKEN") &&
-          ENV.key?("ACCESS_SECRET")
-        return true
-      else
-        puts "The credentials have not been correctly set up in your ENV"
-      end
+      OAuth::Token.new(authorizer.access_token, authorizer.access_secret)
     end
 
     def setup_https
