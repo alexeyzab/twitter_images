@@ -31,6 +31,7 @@ and generate the required credentials.}
   spec.add_dependency "oauth", "~> 0.4",  ">= 0.4.7"
   spec.add_dependency "ruby-progressbar", "~> 1.7",  ">= 1.7.5"
   spec.add_dependency "typhoeus", "~> 1.0"
+  spec.add_dependency "launchy"
 
   spec.add_development_dependency "bundler", "~> 1.8"
   spec.add_development_dependency "rake", "~> 10.0"
