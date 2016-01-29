@@ -77,31 +77,6 @@ describe TwitterImages::Requester do
     end
   end
 
-  describe "#check_env" do
-    it "returns true if the credentials are found in ENV" do
-      requester = TwitterImages::Requester.new
-      ENV["CONSUMER_KEY"] = "key"
-      ENV["CONSUMER_SECRET"] = "key_secret"
-      ENV["ACCESS_TOKEN"] = "token"
-      ENV["ACCESS_SECRET"] = "token_secret"
-      result = requester.send(:check_env)
-
-      expect(result).to eq(true)
-    end
-
-    it "tells you to the credentials have not been set up otherwise" do
-      requester = TwitterImages::Requester.new
-      ENV.delete("CONSUMER_KEY")
-      ENV.delete("CONSUMER_SECRET")
-      ENV.delete("ACCESS_TOKEN")
-      ENV.delete("ACCESS_SECRET")
-
-      expect(STDOUT).to receive(:puts).with("The credentials have not been correctly set up in your ENV")
-
-      requester.send(:check_env)
-    end
-  end
-
   describe "#setup_https" do
     it "sets up the http" do
       requester = TwitterImages::Requester.new
