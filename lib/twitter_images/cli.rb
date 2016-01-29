@@ -35,6 +35,11 @@ module TwitterImages
           puts opts
           exit
         end
+
+        opts.on("-a", "--authorize", "Run this first to authorize the app with Twitter") do
+          Authorizer.new.authorize
+          exit
+        end
       end
     end
   end
