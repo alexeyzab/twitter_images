@@ -8,6 +8,7 @@ module TwitterImages
     end
 
     def prepare(options)
+      check_auth
       set_directory(options[:path])
       get_search(options[:term])
       get_amount(options[:amount])
@@ -16,17 +17,15 @@ module TwitterImages
 
     private
 
+    def check_auth
+      unless File.exist?(ENV["HOME"] + "/.twitter_imagesrc")
+        raise StandardError, "No configuration file was found, please run `twitter_images -auth`"
+      end
+    end
+
     def set_directory(dir)
       @directory = File.expand_path(dir)
-      raise StandardError, "Directory doesn't exist" unless directory_exists?
-      change_directory
-    end
-
-    def directory_exists?
-      Dir.exist?(@directory)
-    end
-
-    def change_directory
+      raise StandardError, "Directory doesn't exist" unless Dir.exist?(@directory)
       Dir.chdir(@directory)
     end
 
