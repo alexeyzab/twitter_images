@@ -27,11 +27,13 @@ describe TwitterImages::Downloader do
       data = File.open("spec/fixture.jpg", "r")
       allow(downloader).to receive(:open).and_return(data)
 
+      dir = Dir.getwd
       Dir.chdir("#{Dir.getwd}/spec")
 
       downloader.send(:save_images, parsed_links)
 
       expect(File).to exist("#{Dir.getwd}/123456789000000.jpg")
+      Dir.chdir(dir)
     end
   end
 
