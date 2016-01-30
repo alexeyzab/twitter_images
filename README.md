@@ -25,19 +25,15 @@ Execute this in the terminal:
 
 ![alt tag](http://i.imgur.com/OrielQo.gif)
 
-In order to use this gem you have to set up your Twitter credentials.
-You can get those at [Twitter app management page](https://apps.twitter.com/).
-Create a new app, go to Keys and Access Tokens, generate your Access Token.
+After installing the gem you need to run the following command to authorize the
+app with Twitter:
 
-Then you should set up
+`twitter_images -a`
 
-    CONSUMER_KEY
-    CONSUMER_SECRET
-    ACCESS_TOKEN
-    ACCESS_SECRET
-
-in your .bashrc, .bash_profile, .zshenv or whichever shell config you normally
-use.
+After that, your credentials will be saved in your home directory, inside a
+`twitter_imagesrc` file. No need to set up any environment variables anymore.
+If you remove the configuration file, you can simply run the command again to
+re-authorize the app.
 
 The CLI format is as follows: `twitter_images [path] [search terms] [amount]`
 
