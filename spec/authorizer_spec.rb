@@ -6,6 +6,7 @@ describe TwitterImages::Authorizer do
   describe "#access_token" do
     it "gets the access_token from the config file" do
       file = ["token\n", "secret\n"]
+      allow(File).to receive(:exist?).and_return(true)
       allow(IO).to receive(:readlines).and_return(file)
 
       expect(authorizer.access_token).to eq("token")
@@ -15,6 +16,7 @@ describe TwitterImages::Authorizer do
   describe "#access_secret" do
     it "gets the access_secret from the config file" do
       file = ["token\n", "secret\n"]
+      allow(File).to receive(:exist?).and_return(true)
       allow(IO).to receive(:readlines).and_return(file)
 
       expect(authorizer.access_secret).to eq("secret")

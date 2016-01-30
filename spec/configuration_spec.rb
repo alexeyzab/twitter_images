@@ -14,6 +14,7 @@ describe TwitterImages::Configuration do
     it "calls the right methods to prepare the configuration" do
       configuration = TwitterImages::Configuration.new
       options = { path: "./test_pics", term: "cats", amount: "150" }
+      allow(configuration).to receive(:check_auth).and_return(true)
       allow(configuration).to receive(:set_directory)
       allow(configuration).to receive(:get_search)
       allow(configuration).to receive(:get_amount)
