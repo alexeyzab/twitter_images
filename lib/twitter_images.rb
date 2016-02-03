@@ -1,6 +1,6 @@
 require "rubygems"
 require "open-uri"
-require "fileutils"
+# require "fileutils"
 require "json"
 require "oauth"
 require "ruby-progressbar"

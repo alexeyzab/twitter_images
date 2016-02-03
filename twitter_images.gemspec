@@ -26,7 +26,7 @@ and generate the required credentials.}
     spec.metadata["allowed_push_host"] = "https://rubygems.org"
   end
 
-  spec.add_dependency "fileutils", "~> 0.7"
+  # spec.add_dependency "fileutils", "~> 0.7"
   spec.add_dependency "json", "~> 1.8.2", ">= 1.8.2"
   spec.add_dependency "oauth", "~> 0.4",  ">= 0.4.7"
   spec.add_dependency "ruby-progressbar", "~> 1.7",  ">= 1.7.5"
