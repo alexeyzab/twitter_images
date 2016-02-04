@@ -15,6 +15,8 @@ module TwitterImages
     end
 
     def get_links(search, amount)
+      setup_address(search)
+      setup_https
       loop do
         configure_request(search)
         parse
@@ -27,7 +29,6 @@ module TwitterImages
 
     def configure_request(search)
       setup_address(search)
-      setup_https
       issue_request
     end
 
@@ -56,7 +57,6 @@ module TwitterImages
     def issue_request
       request = Net::HTTP::Get.new(address.request_uri)
       request.oauth!(https, consumer_key, access_token)
-      @https.start
       @response = https.request(request)
     end
 

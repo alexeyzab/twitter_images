@@ -35,7 +35,6 @@ describe TwitterImages::Requester do
       requester = TwitterImages::Requester.new
 
       expect(requester).to receive(:setup_address).with("cats")
-      expect(requester).to receive(:setup_https)
       expect(requester).to receive(:issue_request)
 
       requester.send(:configure_request, "cats")
