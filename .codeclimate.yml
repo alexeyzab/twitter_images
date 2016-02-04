@@ -12,6 +12,8 @@ engines:
       - php
   fixme:
     enabled: true
+    exclude_fingerprints:
+    - cdc1cac1f5cb7afe72dca9f9bca8a237
   rubocop:
     enabled: true
 ratings:
