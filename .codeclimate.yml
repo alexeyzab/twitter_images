@@ -14,6 +14,8 @@ engines:
     enabled: true
     exclude_fingerprints:
     - cdc1cac1f5cb7afe72dca9f9bca8a237
+    - b86af833d6b2b1fa18da63471e2278d9
+    - ee0a31701f95b21db4aff40647a56a3d
   rubocop:
     enabled: true
 ratings:
