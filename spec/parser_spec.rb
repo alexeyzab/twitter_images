@@ -40,6 +40,24 @@ describe TwitterImages::Parser do
 
       expect(parser.max_id).to eq(122)
     end
+
+    it "checks for erros if there are no statuses in parsed is nil" do
+      parser = TwitterImages::Parser.new
+      parsed = { "errors" =>[ { "message" => "Rate limit exceeded", "code" => 88 } ] }
+
+      expect(parser).to receive(:check_errors).with(parsed)
+
+      parser.send(:get_max_id, parsed)
+    end
+  end
+
+  describe "#check_errors" do
+    it "prints the error message" do
+      parser = TwitterImages::Parser.new
+      parsed = { "errors" =>[ { "message" => "Rate limit exceeded", "code" => 88 } ] }
+
+      expect { parser.send(:check_errors, parsed) }.to raise_error(StandardError, "Rate limit exceeded")
+    end
   end
 
   describe "#collect_responses" do

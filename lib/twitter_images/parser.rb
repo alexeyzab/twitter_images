@@ -20,11 +20,19 @@ module TwitterImages
     private
 
     def get_max_id(parsed)
-      ids = []
-      parsed["statuses"].each do |tweet|
-        ids << tweet["id"]
+      if parsed["statuses"].nil?
+        check_errors(parsed)
+      else
+        ids = []
+        parsed["statuses"].each do |tweet|
+          ids << tweet["id"]
+        end
+        @max_id = ids.min - 1
       end
-      @max_id = ids.min - 1
+    end
+
+    def check_errors(parsed)
+      raise StandardError,  parsed["errors"].first["message"]
     end
 
     def collect_responses(parsed)
