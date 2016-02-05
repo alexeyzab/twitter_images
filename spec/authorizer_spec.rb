@@ -3,22 +3,15 @@ require "spec_helper"
 describe TwitterImages::Authorizer do
   authorizer = TwitterImages::Authorizer.new
 
-  describe "#access_token" do
-    it "gets the access_token from the config file" do
+  describe "#assign_credentials" do
+    it "assigns the credentials from the config file" do
       file = ["token\n", "secret\n"]
       allow(File).to receive(:exist?).and_return(true)
       allow(IO).to receive(:readlines).and_return(file)
+
+      authorizer.assign_credentials
 
       expect(authorizer.access_token).to eq("token")
-    end
-  end
-
-  describe "#access_secret" do
-    it "gets the access_secret from the config file" do
-      file = ["token\n", "secret\n"]
-      allow(File).to receive(:exist?).and_return(true)
-      allow(IO).to receive(:readlines).and_return(file)
-
       expect(authorizer.access_secret).to eq("secret")
     end
   end
@@ -59,7 +52,7 @@ describe TwitterImages::Authorizer do
     end
   end
 
-  describe "#set_credentials" do
+  describe "#write_credentials" do
     it "writes the credentials to a config file" do
       access_token_object_double = double("Object", :token => "token", :secret => "secret")
       allow(authorizer).to receive(:access_token_object).and_return(access_token_object_double)
@@ -67,7 +60,7 @@ describe TwitterImages::Authorizer do
 
       allow(File).to receive(:open).and_return(fixture_file)
 
-      authorizer.send(:set_credentials)
+      authorizer.send(:write_credentials)
 
       expect(IO.readlines("spec/fixture_file")[0].chomp).to eq("token")
       expect(IO.readlines("spec/fixture_file")[1].chomp).to eq("secret")

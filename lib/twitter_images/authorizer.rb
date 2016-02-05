@@ -7,18 +7,14 @@ module TwitterImages
       visit_url
       get_pin
       authorize_with_pin
-      set_credentials
+      write_credentials
+      assign_credentials
       puts "Authorization successful. Credentials have been written to #{ENV['HOME']}/.twitter_imagesrc"
     end
 
-    def access_token
+    def assign_credentials
       if File.exist?(ENV["HOME"] + "/.twitter_imagesrc")
         @access_token = IO.readlines(ENV["HOME"] + "/.twitter_imagesrc")[0].chomp
-      end
-    end
-
-    def access_secret
-      if File.exist?(ENV["HOME"] + "/.twitter_imagesrc")
         @access_secret = IO.readlines(ENV["HOME"] + "/.twitter_imagesrc")[1].chomp
       end
     end
@@ -44,7 +40,7 @@ module TwitterImages
       @access_token_object = request_token.get_access_token(:oauth_verifier => @pin)
     end
 
-    def set_credentials
+    def write_credentials
       File.open(ENV["HOME"] + "/.twitter_imagesrc", "w") do |file|
         file.puts(access_token_object.token)
         file.puts(access_token_object.secret)
