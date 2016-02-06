@@ -14,6 +14,7 @@ describe TwitterImages::Requester do
       allow(requester).to receive(:get_links).with("cats", 200)
 
       expect(requester.downloader).to receive(:download)
+      expect(STDOUT).to receive(:puts).with("Getting links to the images...")
 
       requester.start("cats", 200)
     end

@@ -10,6 +10,7 @@ module TwitterImages
     end
 
     def start(search, amount)
+      puts "Getting links to the images..."
       get_links(search, amount)
       download
     end
