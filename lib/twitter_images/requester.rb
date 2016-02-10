@@ -1,76 +1,73 @@
 module TwitterImages
   class Requester
-    attr_reader   :consumer_key, :access_token, :downloader, :search, :parser, :authorizer
-    attr_accessor :https, :address, :response
+    attr_reader   :downloader, :authorizer, :search
+    attr_accessor :client, :tweets, :links, :max_id
 
     def initialize
       @downloader = Downloader.new
-      @parser = Parser.new
       @authorizer = Authorizer.new
+      @max_id = nil
+      @tweets = []
+      @links = []
     end
 
     def start(search, amount)
       puts "Getting links to the images..."
-      get_links(search, amount)
-      download
+      send_requests(search, amount)
+      download(links)
     end
 
-    def get_links(search, amount)
-      setup_address(search)
-      setup_https
+    def send_requests(search, amount)
+      configure_client
       loop do
-        configure_request(search)
-        parse
-        break if @parser.parsed_links.count > amount
+        get_tweets(search, amount)
+        break if @links.count > amount
       end
       trim_links(amount)
     end
 
     private
 
-    def configure_request(search)
-      setup_address(search)
-      issue_request
-    end
-
-    def setup_address(search)
-      unless parser.max_id.nil?
-        @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=#{search}&result_type=recent&count=100&max_id=#{parser.max_id}")
-      else
-        @address = URI("https://api.twitter.com/1.1/search/tweets.json?q=#{search}&result_type=recent&count=100")
+    def configure_client
+      @client = Twitter::REST::Client.new do |config|
+        config.consumer_key = CONSUMER_KEY
+        config.consumer_secret = CONSUMER_SECRET
+        config.access_token = authorizer.access_token
+        config.access_token_secret = authorizer.access_secret
       end
     end
 
-    def consumer_key
-      OAuth::Consumer.new(CONSUMER_KEY, CONSUMER_SECRET)
+    def get_tweets(search, amount)
+      client.search(search, result_type: "recent", max_id: @max_id).take(amount).each do |tweet|
+        @tweets << tweet
+      end
+      get_max_id(@tweets)
+      get_links(@tweets)
     end
 
-    def access_token
-      OAuth::Token.new(authorizer.access_token, authorizer.access_secret)
+    def get_max_id(tweets)
+      ids = []
+      tweets.each do |tweet|
+        ids << tweet.id
+      end
+      @max_id = ids.min - 1
     end
 
-    def setup_https
-      @https = Net::HTTP.new(address.host, address.port)
-      https.use_ssl = true
-      https.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    end
-
-    def issue_request
-      request = Net::HTTP::Get.new(address.request_uri)
-      request.oauth!(https, consumer_key, access_token)
-      @response = https.request(request)
-    end
-
-    def parse
-      parser.parse(response)
+    def get_links(tweets)
+      tweets.each do |tweet|
+        if !tweet.media.empty?
+          @links << tweet.media[0].media_url.to_s
+          @links.uniq!
+        end
+      end
     end
 
     def trim_links(amount)
-      parser.trim_links(amount)
+      @links = @links.slice!(0...amount)
     end
 
-    def download
-      downloader.download(parser.parsed_links)
+    def download(links)
+      downloader.download(links)
     end
   end
 end

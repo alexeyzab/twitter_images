@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe TwitterImages::Requester do
+  requester = TwitterImages::Requester.new
 
   describe "#initialize" do
     it "doesn't raise an error when initialized" do
@@ -10,8 +11,7 @@ describe TwitterImages::Requester do
 
   describe "#start" do
     it "passes on the download message to downloader" do
-      requester = TwitterImages::Requester.new
-      allow(requester).to receive(:get_links).with("cats", 200)
+      allow(requester).to receive(:send_requests).with("cats", 200)
 
       expect(requester.downloader).to receive(:download)
       expect(STDOUT).to receive(:puts).with("Getting links to the images...")
@@ -20,110 +20,84 @@ describe TwitterImages::Requester do
     end
   end
 
-  describe "#get_links" do
+  describe "#send_requests" do
     it "calls the right methods to get links" do
-      requester = TwitterImages::Requester.new
-      expect(requester).to receive(:configure_request).with("cats")
-      expect(requester).to receive(:parse)
-      expect(requester.parser).to receive(:trim_links).with(-1)
+      expect(requester).to receive(:configure_client)
+      expect(requester).to receive(:get_tweets).with("cats", -1)
+      expect(requester).to receive(:trim_links).with(-1)
 
-      requester.get_links("cats", -1)
+      requester.send_requests("cats", -1)
     end
   end
 
-  describe "#configure_request" do
-    it "calls the right methods to configure request" do
-      requester = TwitterImages::Requester.new
+  describe "#configure_client" do
+    it "calls the right methods to configure the client" do
+      requester.send(:configure_client)
 
-      expect(requester).to receive(:setup_address).with("cats")
-      expect(requester).to receive(:issue_request)
-
-      requester.send(:configure_request, "cats")
+      expect(requester.client).to be_a(Twitter::REST::Client)
     end
   end
 
-  describe "#setup_address" do
-    it "creates a URI without max_id" do
-      requester = TwitterImages::Requester.new
-      result = requester.send(:setup_address, "cats")
+  describe "#get_tweets" do
+    it "calls the right method after getting the tweet objects" do
+      requester.client = double("client")
+      allow(requester.client).to receive_message_chain(:search, :take, :each)
 
-      expect(result.inspect).to eq("#<URI::HTTPS https://api.twitter.com/1.1/search/tweets.json?q=cats&result_type=recent&count=100>")
-    end
+      expect(requester).to receive(:get_max_id)
+      expect(requester).to receive(:get_links)
 
-    it "adds the max_id parameter to the address if it's present" do
-      requester = TwitterImages::Requester.new
-      requester.parser.max_id = 123456
-      result = requester.send(:setup_address, "cats")
-
-      expect(result.inspect).to eq("#<URI::HTTPS https://api.twitter.com/1.1/search/tweets.json?q=cats&result_type=recent&count=100&max_id=123456>")
+      requester.send(:get_tweets, "cats", 2)
     end
   end
 
-  describe "#consumer_key" do
-    it "generates the consumer key object from the consumer key and secret" do
-      requester = TwitterImages::Requester.new
-      CONSUMER_KEY = "key"
-      CONSUMER_SECRET = "secret"
-      result = requester.send(:consumer_key)
+  describe "#get_max_id" do
+    it "gets the smallest id minus one for each tweet batch" do
+      tweet_1 = double("Tweet", id: 124)
+      tweet_2 = double("Tweet", id: 123)
+      tweets = [tweet_1, tweet_2]
 
-      expect(result).to be_a(OAuth::Consumer)
+      requester.send(:get_max_id, tweets)
+
+      expect(requester.max_id).to eq(122)
     end
   end
 
-  describe "#access_token" do
-    it "generates the access token object from the access token and secret" do
-      requester = TwitterImages::Requester.new
-      result = requester.send(:access_token)
+  describe "#get_links" do
+    it "pulls the image links out of the tweet objects" do
+      requester.links.clear
+      inner_double_1 = double("inner", media_url: "link1")
+      inner_double_2 = double("inner", media_url: "link2")
+      tweet_1 = double("Tweet", media: [inner_double_1])
+      tweet_2 = double("Tweet", media: [inner_double_2])
+      tweets = [tweet_1, tweet_2]
 
-      expect(result).to be_a(OAuth::Token)
-    end
-  end
+      requester.send(:get_links, tweets)
 
-  describe "#setup_https" do
-    it "sets up the http" do
-      requester = TwitterImages::Requester.new
-      requester.address = double("address", :host => "api.twitter.com", :port => 443)
-
-      requester.send(:setup_https)
-
-      expect(requester.https).to be_a(Net::HTTP)
+      expect(requester.links).to eq(["link1", "link2"])
     end
 
-    it "enables the use of SSL" do
-      requester = TwitterImages::Requester.new
-      requester.address = double("address", :host => "api.twitter.com", :port => 443)
+    it "makes sure the links are unique" do
+      requester.links.clear
+      inner_double_1 = double("inner", media_url: "link1")
+      inner_double_2 = double("inner", media_url: "link2")
+      tweet_1 = double("Tweet", media: [inner_double_1])
+      tweet_2 = double("Tweet", media: [inner_double_2])
+      tweet_3 = double("Tweet", media: [inner_double_2])
+      tweets = [tweet_1, tweet_2, tweet_3]
 
-      requester.send(:setup_https)
+      requester.send(:get_links, tweets)
 
-      expect(requester.https.use_ssl?).to eq(true)
-    end
-
-    it "sets the right SSL verify mode" do
-      requester = TwitterImages::Requester.new
-      requester.address = double("address", :host => "api.twitter.com", :port => 443)
-
-      requester.send(:setup_https)
-
-      expect(requester.https.verify_mode).to eq(0)
-    end
-  end
-
-  describe "#parse" do
-    it "sends parse to parser" do
-      requester = TwitterImages::Requester.new
-
-      expect(requester.parser).to receive(:parse)
-
-      requester.send(:parse)
+      expect(requester.links).to eq(["link1", "link2"])
     end
   end
 
   describe "#trim_links" do
-    it "calls the Parser's method" do
-      requester = TwitterImages::Requester.new
-      expect(requester.parser).to receive(:trim_links).with(10)
+    it "trims the excess links" do
+      requester.links = Array.new(3) { "link" }
 
-      requester.send(:trim_links, 10)
+      requester.send(:trim_links, 2)
+
+      expect(requester.links.count).to eq(2)
     end
   end
 end
