@@ -7,6 +7,7 @@ require "ruby-progressbar"
 require "typhoeus"
 require "optparse"
 require "launchy"
+require "twitter"
 
 require "twitter_images/cli"
 require "twitter_images/configuration"
