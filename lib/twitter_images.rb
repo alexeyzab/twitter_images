@@ -1,6 +1,4 @@
 require "rubygems"
-require "open-uri"
-require "json"
 require "oauth"
 require "ruby-progressbar"
 require "typhoeus"
