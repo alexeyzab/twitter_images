@@ -30,6 +30,7 @@ describe TwitterImages::CLI do
       expect(cli).to receive(:global_options)
 
       cli.send(:parse_command_line_options)
+      ARGV.clear
     end
 
     it "assigns the options hash" do
@@ -39,6 +40,7 @@ describe TwitterImages::CLI do
       cli.send(:parse_command_line_options)
 
       expect(cli.options).to eq({ :path => "./test_pics", :term => "#cats", :amount => "50" })
+      ARGV.clear
     end
   end
 end
