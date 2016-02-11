@@ -12,7 +12,7 @@ module TwitterImages
     end
 
     def start(search, amount)
-      puts "Getting links to the images..."
+      puts "Getting links to the pictures..."
       send_requests(search, amount)
       download(links)
     end
