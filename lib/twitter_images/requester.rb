@@ -63,7 +63,7 @@ module TwitterImages
     end
 
     def trim_links(amount)
-      @links = @links.slice!(0...amount)
+      @links = @links.slice(0...amount)
     end
 
     def download(links)
