@@ -52,9 +52,20 @@ Please note that the Twitter API rate limit is 180 calls every 15 minutes.
 
 ## Development
 
-After checking out the repo, run `bundle` to install the dependencies.
+If you want to build a runnable version yourself, follow these simple steps
 
-To install this gem onto your local machine, run `bundle exec rake install`.
+* Create your own [Twitter Application](https://apps.twitter.com/app/new)
+
+* Get your Twitter application's API key and secret
+
+* Put those in the `lib/twitter_images/consumer.rb`:
+
+```
+CONSUMER_KEY = "APIKey"
+CONSUMER_SECRET = "APISecret"
+```
+
+* Install locally with `bundle exec rake install`
 
 ## Contributing
 
