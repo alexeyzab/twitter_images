@@ -42,11 +42,6 @@ describe TwitterImages::Authorizer do
   end
 
   describe "#get_pin" do
-    it "asks for your pin" do
-      expect(STDOUT).to receive(:puts).with("Please enter your pin here: ")
-      authorizer.send(:get_pin)
-    end
-
     it "stores your pin in a variable" do
       allow(authorizer).to receive(:gets).and_return("12345678\n")
       authorizer.send(:get_pin)
