@@ -1,11 +1,11 @@
 module TwitterImages
   class Requester
-    attr_reader   :downloader, :authorizer, :search
+    attr_reader   :downloader, :credentials, :search
     attr_accessor :client, :tweets, :links, :max_id
 
     def initialize
       @downloader = Downloader.new
-      @authorizer = Authorizer.new
+      @credentials = Credentials.new
       @max_id = nil
       @tweets = []
       @links = []
@@ -30,10 +30,10 @@ module TwitterImages
 
     def configure_client
       @client = Twitter::REST::Client.new do |config|
-        config.consumer_key = CONSUMER_KEY
-        config.consumer_secret = CONSUMER_SECRET
-        config.access_token = authorizer.access_token
-        config.access_token_secret = authorizer.access_secret
+        config.consumer_key = credentials.consumer_key
+        config.consumer_secret = credentials.consumer_secret
+        config.access_token = credentials.access_token
+        config.access_token_secret = credentials.access_secret
       end
     end
 
