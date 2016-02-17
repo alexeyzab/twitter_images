@@ -1,4 +1,0 @@
-module TwitterImages
-  CONSUMER_KEY = ENV["CONSUMER_KEY"]
-  CONSUMER_SECRET = ENV["CONSUMER_SECRET"]
-end
