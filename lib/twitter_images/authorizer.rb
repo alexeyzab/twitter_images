@@ -1,28 +1,20 @@
 module TwitterImages
   class Authorizer
-    attr_reader :oauth, :request_token, :pin, :access_token_object, :access_token, :access_secret
+    attr_reader :oauth, :request_token, :pin, :access_token_object
 
     def authorize
       get_request_token
       visit_url
       get_pin
       authorize_with_pin
-      write_credentials
-      assign_credentials
+      handle_credentials
       puts "Authorization successful. Credentials have been written to #{ENV['HOME']}/.twitter_imagesrc"
-    end
-
-    def assign_credentials
-      if File.exist?(ENV["HOME"] + "/.twitter_imagesrc")
-        @access_token = IO.readlines(ENV["HOME"] + "/.twitter_imagesrc")[0].chomp
-        @access_secret = IO.readlines(ENV["HOME"] + "/.twitter_imagesrc")[1].chomp
-      end
     end
 
     private
 
     def get_request_token
-      @oauth = OAuth::Consumer.new(CONSUMER_KEY, CONSUMER_SECRET, :site => "https://api.twitter.com")
+      @oauth = OAuth::Consumer.new(Credentials.new.consumer_key, Credentials.new.consumer_secret, :site => "https://api.twitter.com")
       @request_token = oauth.get_request_token
     end
 
@@ -40,12 +32,8 @@ module TwitterImages
       @access_token_object = request_token.get_access_token(:oauth_verifier => @pin)
     end
 
-    def write_credentials
-      File.open(ENV["HOME"] + "/.twitter_imagesrc", "w") do |file|
-        file.puts(access_token_object.token)
-        file.puts(access_token_object.secret)
-        file.close
-      end
+    def handle_credentials
+      Credentials.new.set(@access_token_object)
     end
   end
 end

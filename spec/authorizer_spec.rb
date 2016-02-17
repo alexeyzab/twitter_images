@@ -3,24 +3,24 @@ require "spec_helper"
 describe TwitterImages::Authorizer do
   authorizer = TwitterImages::Authorizer.new
 
-  describe "#assign_credentials" do
-    it "assigns the credentials from the config file" do
-      file = ["token\n", "secret\n"]
-      allow(File).to receive(:exist?).and_return(true)
-      allow(IO).to receive(:readlines).and_return(file)
+  describe "#authorize" do
+    it "calls the right methods to authorize the app" do
+      expect(authorizer).to receive(:get_request_token)
+      expect(authorizer).to receive(:visit_url)
+      expect(authorizer).to receive(:get_pin)
+      expect(authorizer).to receive(:authorize_with_pin)
+      expect(authorizer).to receive(:handle_credentials)
 
-      authorizer.assign_credentials
-
-      expect(authorizer.access_token).to eq("token")
-      expect(authorizer.access_secret).to eq("secret")
+      authorizer.authorize
     end
   end
 
   describe "#get_request_token" do
     it "gets the request token" do
       oauth = double("Consumer", :get_request_token => 123456789)
-      TwitterImages::Authorizer::CONSUMER_KEY = "key"
-      TwitterImages::Authorizer::CONSUMER_SECRET = "secret"
+      credentials = TwitterImages::Credentials.new
+      allow(credentials).to receive(:consumer_key).and_return("key")
+      allow(credentials).to receive(:consumer_secret).and_return("secret")
       allow(OAuth::Consumer).to receive(:new).and_return(oauth)
 
       authorizer.send(:get_request_token)
@@ -41,6 +41,20 @@ describe TwitterImages::Authorizer do
     end
   end
 
+  describe "#get_pin" do
+    it "asks for your pin" do
+      expect(STDOUT).to receive(:puts).with("Please enter your pin here: ")
+      authorizer.send(:get_pin)
+    end
+
+    it "stores your pin in a variable" do
+      allow(authorizer).to receive(:gets).and_return("12345678\n")
+      authorizer.send(:get_pin)
+
+      expect(authorizer.pin).to eq("12345678")
+    end
+  end
+
   describe "#authorize_with_pin" do
     it "gets the token credentials" do
       double_token = double("Token", :get_access_token => 123456789)
@@ -49,21 +63,6 @@ describe TwitterImages::Authorizer do
       authorizer.send(:authorize_with_pin)
 
       expect(authorizer.access_token_object).not_to be(nil)
-    end
-  end
-
-  describe "#write_credentials" do
-    it "writes the credentials to a config file" do
-      access_token_object_double = double("Object", :token => "token", :secret => "secret")
-      allow(authorizer).to receive(:access_token_object).and_return(access_token_object_double)
-      fixture_file = File.read("spec/fixture_file")
-
-      allow(File).to receive(:open).and_return(fixture_file)
-
-      authorizer.send(:write_credentials)
-
-      expect(IO.readlines("spec/fixture_file")[0].chomp).to eq("token")
-      expect(IO.readlines("spec/fixture_file")[1].chomp).to eq("secret")
     end
   end
 end
