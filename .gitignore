@@ -6,4 +6,3 @@
 /spec/reports/
 /tmp/
 *.gem
-lib/twitter_images/consumer.rb
