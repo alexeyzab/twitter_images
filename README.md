@@ -61,8 +61,13 @@ If you want to build a runnable version yourself, follow these simple steps
 * Put those in the `lib/twitter_images/consumer.rb`:
 
 ```
-CONSUMER_KEY = "APIKey"
-CONSUMER_SECRET = "APISecret"
+def consumer_key
+  "APIKey"
+end
+
+def consumer_secret
+  "APISecret"
+end
 ```
 
 * Install locally with `bundle exec rake install`
