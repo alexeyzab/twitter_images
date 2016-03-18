@@ -16,7 +16,7 @@ module TwitterImages
 
     def save_images(parsed_links)
       progressbar = ProgressBar.create(:total => parsed_links.count, :format => "%a |%b>>%i| %p%% %t")
-      hydra = Typhoeus::Hydra.new
+      hydra = Typhoeus::Hydra.new(max_concurrency: 120)
 
       parsed_links.each do |src|
         request = Typhoeus::Request.new(src + ":large")
@@ -24,7 +24,7 @@ module TwitterImages
           write_file(src, response.body)
           progressbar.increment
         end
-        hydra.queue request
+        hydra.queue(request)
       end
       hydra.run
       puts "Downloaded #{parsed_links.count} pictures!"
